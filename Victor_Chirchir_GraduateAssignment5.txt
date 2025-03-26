@@ -1,0 +1,369 @@
+
+
+Graduate Individual Assignment #5 
+This assignment consisted of three parts
+
+
+
+Part 1:	Using OES4 database, redo the following two queries (you did them in assignment 4) with PL/SQL:
+1. List number of orders for each branch with their total purchase (SUBTOTAL), total shipping charge, total tax, and total purchases (there are 15 branches)
+BRANCH#, #_ORDERS, TOTAL PURCHAES, TOTAL SHIPPING CHARGES, TOTAL TAXES, TOTAL OVERALL PURCHASE (3)
+	Note: Use RPAD or LPAD to develop your report
+
+
+
+CREATE PROCEDURE NUM_ORDERS_PER_BRANCH  
+AS
+BEGIN
+    SELECT BRANCH_NO AS BRANCH# ,COUNT(ORDER_NO) AS #_ORDERS,SUM(SUBTOTAL) AS TOTAL_PURCHAES, SUM(SHIPPING_CHARGE) AS TOTAL_SHIPPING_CHARGES,SUM(TAX_AMT) AS TOTAL_TAXES, SUM(TOTAL_AMT) AS TOTAL_OVERALL_PURCHASE FROM ORDERS
+	GROUP BY BRANCH_NO;
+    
+END;
+
+EXECUTE NUM_ORDERS_PER_BRANCH 
+
+--SOLUTION
+
+BRANCH# 	#_ORDERS 	TOTAL_PURCHAES	TOTAL_SHIPPING_CHARGES	TOTAL_TAXES 	TOTAL_OVERALL_PURCHASE
+108		92			0		0					133910	0
+114		48			0		0					111622	0
+113		79			0		0					140410	0
+100		215			1838735	109304				507588	2042923
+112		134			0		0					257258	0
+105		132			0		0					282689	0
+107		99			0		0					196627	0
+106		135			0		0					299905	0
+102		74			0		0					93770	0
+109		12			0		0					76300	0
+103		82			0		0					161407	0
+110		69			0		0					103744	0
+101		120			881000	34600					338430	985000
+111		70			0		0					76399		0
+104		114			0		0					166000	0
+
+
+NOTE: 'RPAD'/'LPAD' is not a recognized built-in function name IN MSSQL.
+
+
+2. List number of employees with their total sales (SUBTOTAL), total shipping charge, total tax, and overall total SALESs.
+EMPLOYEE_NO, TOTAL SALES, TOTAL SHIPPING CHARGES, TOTAL TAXES, TOTAL OVERALL SALES (3)
+
+CREATE PROCEDURE NUM_OF_EMPLOYEES  
+AS
+BEGIN
+    SELECT EMPLOYEE_NO,  SUM(SUBTOTAL) AS TOTAL_SALES, SUM(SHIPPING_CHARGE) AS TOTAL_SHIPPING_CHARGES, SUM(TAX_AMT) AS TOTAL_TAXES, SUM(TOTAL_AMT) AS TOTAL_OVERALL_SALES FROM ORDERS
+	GROUP BY EMPLOYEE_NO;
+    
+END;
+EXECUTE NUM_OF_EMPLOYEES 
+
+--SOLUTION
+
+EMPLOYEE_NO 	TOTAL_SALES		TOTAL_SHIPPING_CHARGES	TOTAL_TAXES		TOTAL_OVERALL_SALES
+1067				0			0			65399			0
+1084				0			0			48810			0
+1005				918445		76136			76411			1041934
+1003				656088		25200			127839		712588
+1002				0			0			30585			0
+1006				0			0			31346			0
+1047				0			0			0			0
+1080				0			0			40420			0
+1011				0			0			84930			0
+1066				0			0			37660			0
+1012				0			0			29550			0
+1088				0			0			28545			0
+1036				0			0			168519		0
+1037				0			0			107670		0
+1059				0			0			44470			0
+1071				0			0			30920			0
+1076				0			0			14735			0
+1053				0			0			7700			0
+1073				0			0			19350			0
+1000				0			0			0			0
+
+3. List all product categories and number of products sold for each category 
+			PRODUCT_CATEGORY	QTY_SOLD
+
+CREATE PROCEDURE PRODUCT_NUM_CATEGORY  
+AS
+BEGIN
+    SELECT PRODUCT_CATEGORY, SUM(ORDER_QTY) AS QTY_SOLD  
+    FROM PRODUCT
+	GROUP BY PRODUCT_CATEGORY;
+    
+END;
+EXECUTE PRODUCT_NUM_CATEGORY 
+
+--SOLUTION
+
+PRODUCT_CATEGORY	QTY_SOLD
+
+Entertainment	10
+Game			115
+Hardware		60
+Software		50
+
+Part2: Using OES4, answer the following queries with stored procedures
+4	Create several procedures to accept product number and produce the following result
+a.	Procedure Get_Product_Num_Cust
+i.	Receives product number as input and produces number of customers purchased that product as output
+
+CREATE PROCEDURE Get_Product_Num_Cust 
+AS
+BEGIN
+    SELECT OL.PRODUCT_NO ,COUNT(O.CUSTOMER_NO) AS NUM_OF_CUSTOMERS FROM ORDERS O
+	JOIN ORDERLINE OL ON OL.ORDER_NO = O.ORDER_NO
+	GROUP BY OL.PRODUCT_NO;
+    
+END;
+
+EXECUTE Get_Product_Num_Cust 
+
+--SOLUTION
+
+PRODUCT_NO 		NUM_OF_CUSTOMERS
+120			241
+180			238
+170			273
+150			306
+160			296
+140			342
+130			345
+110			316
+200			262
+190			234
+
+
+b.	Procedure Get_ Product_Cust_Purchases
+i.	Receives Product number as input and produces total purchases by all customer of that product as output
+
+CREATE PROCEDURE Get_Product_Cust_Purchases
+AS
+BEGIN
+   SELECT OL.PRODUCT_NO, SUM(O.SUBTOTAL) AS TOTAL_PURCHASES FROM ORDERS O
+    JOIN ORDERLINE OL ON OL.ORDER_NO = O.ORDER_NO
+	GROUP BY PRODUCT_NO;   
+END;
+EXECUTE Get_Product_Cust_Purchases
+
+--SOLUTION
+PRODUCT_NO 	TOTAL_PURCHASES
+120		1015595
+180		352000
+170		306000
+150		13000
+160		724000
+140		346037
+130		1640428
+110		1172290
+200		316000
+190		672000
+
+c.	Procedure Get_product_Num_orders
+i.	Receives product number as input and produces number of orders by all customers for that product as output
+
+CREATE PROCEDURE Get_product_Num_orders
+AS
+BEGIN
+   SELECT OL.PRODUCT_NO, COUNT(O.ORDER_NO) AS NUM_OF_ORDERS FROM ORDERS O
+    JOIN ORDERLINE OL ON OL.ORDER_NO = O.ORDER_NO
+	GROUP BY PRODUCT_NO;   
+END;
+EXECUTE Get_product_Num_orders
+
+--SOLUTION
+PRODUCT_NO		NUM_OF_ORDERS	
+120			241
+180			238
+170			273
+150			306
+160			296
+140			342
+130			345
+110			316
+200			262
+190			234
+
+
+
+5	Develop a driver program to call all the 5 above procedures and produce the following report 
+PRODUCT#, TOTAL_SALES, TOTAL_NUMBER_ORDERS
+
+		Note: Net sales=Total_sales_amount  – total_return_amount
+Use RPAD or LPAD to develop your report
+
+CREATE PROCEDURE REPORT AS
+BEGIN
+SELECT OL.PRODUCT_NO, SUM(O.SUBTOTAL) AS TOTAL_SALES, COUNT(O.ORDER_NO) AS NUM_OF_ORDERS FROM ORDERS O
+    JOIN ORDERLINE OL ON OL.ORDER_NO = O.ORDER_NO
+	GROUP BY PRODUCT_NO;
+END;
+
+EXEC REPORT
+
+--SOLUTION
+
+PRODUCT_NO		TOTAL_SALES		NUM_OF_ORDERS
+120			1015595		241
+180			352000		238
+170			306000		273
+150			13000			306
+160			724000		296
+140			346037		342
+130			1640428		345
+110			1172290		316
+200			316000		262
+190			672000		234
+
+NOTE : 'RPAD'/'LPAD' is not a recognized built-in function name IN MSSQL.
+
+Part3: Using OES4, answer the following queries with user defined functions
+6.	Create several user defined functions to accept product number and produce the following result
+a.	Function Get_Product_Num_Cust
+i.	Receives product number as input and produces number of customers purchased that product as output
+
+create function Get_Product_Num_Cust(@PROD_NO numeric)
+      returns numeric as
+ begin
+    declare a cursor local for SELECT COUNT(CUSTOMER_NO) AS CUST_NO  FROM ORDERS
+    JOIN ORDERLINE ON ORDERLINE.ORDER_NO = ORDERS.ORDER_NO
+		where PRODUCT_NO=@PROD_NO;
+   declare @a_var_tot numeric
+     open a;
+     fetch a into @a_var_tot;
+     if @@fetch_status = 0 
+	 begin
+         return @a_var_tot;
+     end
+     else begin
+         return '0';
+     end 
+     return null;
+   end;
+GO
+
+drop function Get_Product_Num_Cust;
+
+select PRODUCT_NO, dbo.Get_Product_Num_Cust(PRODUCT_NO) as Num_Customers from product;
+
+--SOLUTION
+
+PRODUCT_NO     Num_Customers
+
+120				241
+130				345
+140				342
+150				306
+160				296
+170				273
+180				238
+190				234
+200				262
+
+
+
+b.	Function Get_ Product_Cust_Purchases
+i.	Receives Product number as input and produces total purchases by all customer of that product as output
+
+create function Get_Product_Cust_Purchases(@PROD_NO numeric)
+      returns numeric as
+ begin
+    declare a cursor local for SELECT SUM(SUBTOTAL) AS TOTAL_PURCHASES  FROM ORDERS
+    JOIN ORDERLINE ON ORDERLINE.ORDER_NO = ORDERS.ORDER_NO
+    WHERE PRODUCT_NO = @PROD_NO;
+   declare @a_var_tot numeric
+     open a;
+     fetch a into @a_var_tot;
+     if @@fetch_status = 0 
+	 begin
+         return @a_var_tot;
+     end
+     else begin
+         return '0';
+     end 
+     return null;
+   end;
+GO
+
+drop function Get_Product_Cust_Purchases;
+
+select PRODUCT_NO, dbo.Get_Product_Cust_Purchases(PRODUCT_NO) as Cust_Purchases from product;
+
+
+---SOLUTION
+
+PRODUCT_NO		Cust_Purchases
+
+120				1015595
+130				1640428
+140				346037
+150				13000
+160				724000
+170				306000
+180				352000
+190				672000
+200				316000
+
+
+
+c.	Function Get_product_Num_orders
+i.	Receives product number as input and produces number of orders by all customers for that product as output
+
+create function Get_product_Num_orders(@PROD_NO numeric)
+      returns numeric as
+ begin
+    declare a cursor local for select count(order_no) as ORDS from orderline where product_no=@PROD_NO;
+   declare @a_var_tot numeric
+     open a;
+     fetch a into @a_var_tot;
+     if @@fetch_status = 0 
+	 begin
+         return @a_var_tot;
+     end
+     else begin
+         return '0';
+     end 
+     return null;
+   end;
+GO
+
+drop function Get_product_Num_orders;
+
+select PRODUCT_NO, dbo.Get_product_Num_orders(PRODUCT_NO) as Total_Orders from product;
+
+--SOLUTION
+
+PRODUCT_NO	Total_Orders
+120			241
+130			345
+140			342
+150			306
+160			296
+170			273
+180			238
+190			234
+200			262
+
+7	Develop SQL program to call these UDFs 
+PRODUCT#, TOTAL_SALES, TOTAL_NUMBER_ORDERS
+
+
+select product_no AS PRODUCT#, DBO.Get_Product_Cust_Purchases(PRODUCT_NO) as TOTAL_SALES,
+DBO.Get_product_Num_orders(product_no) as TOTAL_NUMBER_ORDERS from product
+
+
+
+--SOLUTION
+
+PRODUCT#	TOTAL_SALES		TOTAL_NUMBER_ORDERS
+120			1015595			241
+130			1640428			345
+140			346037			342
+150			13000				306
+160			724000			296
+170			306000			273
+180			352000			238
+190			672000			234
+200			316000			262
+
+

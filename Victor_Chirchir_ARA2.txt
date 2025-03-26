@@ -1,0 +1,578 @@
+										/*Practice 1*/
+
+										Using PROP Database,
+
+
+Query 1: using the concatenation function, combine st address, city state and zip to form address. Do this using PROPERT_FOR_RENT table
+
+SELECT STREET||' '||CITY||' '||POSTCODE as ADDRESS
+FROM PROPERTY_FOR_RENT; 
+
+ADDRESS                         
+---------------------------------
+16 Hollhead Aberdeen AB75SU      
+6 Argyll St London NW2           
+6 Lawrence St Glasgow G119QX     
+2 Manor Rd Glasgow G324QX        
+18 Dale Rd Glasgow G12           
+5 Novar Dr Glasgow G129AX        
+ 
+
+Query 2: convert address in Query all in lower case, upper case and INITCAP
+
+SELECT LOWER(STREET)||' '||LOWER(CITY)||' '||LOWER(POSTCODE) as ADDRESS
+FROM PROPERTY_FOR_RENT; 
+
+ADDRESS                         
+---------------------------------
+16 hollhead aberdeen ab75su      
+6 argyll st london nw2           
+6 lawrence st glasgow g119qx     
+2 manor rd glasgow g324qx        
+18 dale rd glasgow g12           
+5 novar dr glasgow g129ax 
+
+SELECT UPPER(STREET)||' '||UPPER(CITY)||' '||UPPER(POSTCODE) as ADDRESS
+FROM PROPERTY_FOR_RENT; 
+
+ADDRESS                         
+---------------------------------
+16 HOLLHEAD ABERDEEN AB75SU      
+6 ARGYLL ST LONDON NW2           
+6 LAWRENCE ST GLASGOW G119QX     
+2 MANOR RD GLASGOW G324QX        
+18 DALE RD GLASGOW G12           
+5 NOVAR DR GLASGOW G129AX 
+
+SELECT INITCAP(STREET)||' '||INITCAP(CITY)||' '||INITCAP(POSTCODE) as ADDRESS
+FROM PROPERTY_FOR_RENT;
+
+ADDRESS                         
+---------------------------------
+16 Hollhead Aberdeen Ab75su      
+6 Argyll St London Nw2           
+6 Lawrence St Glasgow G119qx     
+2 Manor Rd Glasgow G324qx        
+18 Dale Rd Glasgow G12           
+5 Novar Dr Glasgow G129ax  
+
+
+
+Query 3: Using SUBSTR function, create an email address for your staff by selecting first name concatenate with the first character of last name concatenate with “@PROP2.COM”. For example: JohnS@PROP2.com
+
+
+SELECT FNAME||SUBSTR(LNAME,1,1)||'@PROP2.COM' as EMAIL
+FROM STAFF; 
+
+EMAIL                    
+--------------------------
+JohnW@PROP2.COM           
+AnnB@PROP2.COM            
+DavidF@PROP2.COM          
+MaryH@PROP2.COM           
+SusanB@PROP2.COM          
+JulieL@PROP2.COM 
+
+Query 4: Using DECODE or CASE functions, convert position of “Assistant” to “Assistant Manager”. For other titles replace it with “others”
+
+
+SELECT POSITION,
+DECODE(POSITION,'Assistant','Assistant Manager','other') as "New Position"
+from STAFF;
+
+POSITION        New Position    
+--------------- -----------------
+Manager         other            
+Assistant       Assistant Manager
+Supervisor      other            
+Assistant       Assistant Manager
+Manager         other            
+Assistant       Assistant Manager
+
+
+Use OES4 database
+Query 5: Using substr and Decode or CASE function, list sales (Subtotal in ORDERS table) for each month and order the result based on three character of month from January to December. For example, JAN, FEB, …, DEC)
+
+SELECT DISTINCT SUBSTR(ORDER_DATE,4,3) as MONTH, SUM(SUBTOTAL) as SALES,
+DECODE(SUBSTR(ORDER_DATE,4,3),'APR','SEP','JAN','DEC','FEB','NOV','other') as New_Month
+FROM ORDERS
+GROUP BY SUBSTR(ORDER_DATE,4,3)
+ORDER BY SUBSTR(ORDER_DATE,4,3);
+
+MONTH       SALES NEW_MONTH     
+------ ---------- ---------------
+APR      17969550 SEP            
+AUG      22632690 other          
+DEC      16329795 other          
+FEB       7044145 NOV            
+JAN      16700635 DEC            
+JUL       2649495 other          
+JUN      60201900 other          
+MAR      16960330 other 
+
+										/*Practice 2*/
+
+										Using OES4 database,
+
+Query 1: using concatenation function, combine address, city state and zip to form address. Do this by using customer table
+
+SELECT STREET||' '||CITY||' '||STATE||ZIP as ADDRESS
+FROM CUSTOMER; 
+
+ADDRESS                                                                        
+--------------------------------------------------------------------------------
+16 Skyline Drive Mankato MN56001                                                
+10 State New Ulm MN56023                                                        
+1515 Market Street 13th LITTLE ROCK AR72201                                     
+11160 Veirs Mill Road MADISON WI53703                                           
+1250 Harrinton Ave. BISMARCK ND58501                                            
+13 Federal 704 MADISON WI53703                                                  
+4590 Blake Street JACKSON MS39201
+
+
+
+Query 2: convert address in Query1 all in lower case, upper case and INITCAP
+
+SELECT LOWER(STREET)||' '||LOWER(CITY)||' '||LOWER(STATE)||' '||ZIP as ADDRESS
+FROM CUSTOMER; 
+
+ADDRESS                                                                        
+--------------------------------------------------------------------------------
+16 skyline drive mankato mn 56001                                               
+10 state new ulm mn 56023                                                       
+1515 market street 13th little rock ar 72201                                    
+11160 veirs mill road madison wi 53703                                          
+1250 harrinton ave. bismarck nd 58501                                           
+13 federal 704 madison wi 53703                                                 
+4590 blake street jackson ms 3920
+
+
+SELECT UPPER(STREET)||' '||UPPER(CITY)||' '||UPPER(STATE)||' '||ZIP as ADDRESS
+FROM CUSTOMER; 
+
+ADDRESS                                                                        
+--------------------------------------------------------------------------------
+16 SKYLINE DRIVE MANKATO MN 56001                                               
+10 STATE NEW ULM MN 56023                                                       
+1515 MARKET STREET 13TH LITTLE ROCK AR 72201                                    
+11160 VEIRS MILL ROAD MADISON WI 53703                                          
+1250 HARRINTON AVE. BISMARCK ND 58501 
+
+
+SELECT INITCAP(STREET)||' '||INITCAP(CITY)||' '||INITCAP(STATE)||' '||ZIP as ADDRESS
+FROM CUSTOMER;
+
+
+ADDRESS                                                                        
+--------------------------------------------------------------------------------
+16 Skyline Drive Mankato Mn 56001                                               
+10 State New Ulm Mn 56023                                                       
+1515 Market Street 13th Little Rock Ar 72201                                    
+11160 Veirs Mill Road Madison Wi 53703                                          
+1250 Harrinton Ave. Bismarck Nd 58501                                           
+13 Federal 704 Madison Wi 53703
+
+
+Query 3: Using SUBSTR function, create an email address for your employees by selecting first character of first name concatenate with last name concatenate with “@OES4.COM”. All chracters should be lower case. For example: Jsmith@OES4.com
+
+SELECT SUBSTR(FNAME,1,1)||LOWER(LNAME)||'@OES4.COM' as EMAIL
+FROM EMPLOYEE;
+
+EMAIL                
+----------------------
+Swyatt@OES4.COM       
+Dwright@OES4.COM      
+Aworral@OES4.COM      
+Bwooton@OES4.COM      
+Awiddes@OES4.COM  
+
+Query 4: Using DECODE or CASE functions, convert position of “Sales Manager” to “Senior Sales Manager” and “Customer Service Manager” to “Senior Customer Service Manager”. For other titles replace it with “TBD Later”.
+
+
+SELECT DESCRIPTION,
+DECODE(DESCRIPTION,'Sales Manager', 'Senior Sales Manager',
+'Customer Service Manager', 'Senior Customer Service Manager','TBD Later') as "New Position"
+from EMPLOYEE_POSITION;
+
+DESCRIPTION                              New Position                  
+---------------------------------------- -------------------------------
+CEO                                      TBD Later                      
+Branch Manager                           TBD Later                      
+Sales Manager                            Senior Sales Manager           
+Sales Representative                     TBD Later                      
+Customer Service Manager                 Senior Customer Service Manager
+Customer Service                         TBD Later                      
+Technician                               TBD Later      
+
+
+Query 5: Using substr and Decode or CASE function, list sales (Subtotal in ORDERS table) for each month and order the result based on three character of month from January to December. For example, JAN, FEB, …, DEC)
+
+SELECT DISTINCT SUBSTR(ORDER_DATE,4,3) as MONTH, SUM(SUBTOTAL) as SALES,
+DECODE(SUBSTR(ORDER_DATE,4,3),'APR','SEP','JAN','DEC','FEB','NOV','other') as New_Month
+FROM ORDERS
+GROUP BY SUBSTR(ORDER_DATE,4,3)
+ORDER BY SUBSTR(ORDER_DATE,4,3);
+
+MONTH       SALES NEW_MONTH     
+------ ---------- ---------------
+APR      17969550 SEP            
+AUG      22632690 other          
+DEC      16329795 other          
+FEB       7044145 NOV            
+JAN      16700635 DEC            
+JUL       2649495 other          
+JUN      60201900 other          
+MAR      16960330 other 
+
+
+
+                                   /*Practice 2.1: Using OES4 database*/
+
+
+
+1. List employee number and their total sales using subtotal
+
+
+SELECT  EMPLOYEE_NO,SUM(SUBTOTAL)AS SALES FROM ORDERS
+GROUP BY EMPLOYEE_NO
+ORDER BY EMPLOYEE_NO;
+
+ EMPLOYEE_NO      SALES
+------------- ----------
+         1002    4160045
+         1003    6295955
+         1004    2765245
+         1005    2723640
+         1006     694675
+         1008    3526265
+         1013    1468275
+         1014    4383000
+
+2. Redo number 1 using ROLL UP
+
+SELECT  EMPLOYEE_NO,SUM(SUBTOTAL) AS SALES FROM ORDERS
+GROUP BY ROLLUP(EMPLOYEE_NO)
+ORDER BY EMPLOYEE_NO;
+
+
+ EMPLOYEE_NO      SALES
+------------- ----------
+         1002    4160045
+         1003    6295955
+         1004    2765245
+         1005    2723640
+         1006     694675
+         1008    3526265
+         1013    1468275
+
+3. Redo Number 1 using CUBE
+
+SELECT  EMPLOYEE_NO,SUM(SUBTOTAL) AS SALES FROM ORDERS
+GROUP BY CUBE(EMPLOYEE_NO)
+ORDER BY EMPLOYEE_NO;
+
+
+  EMPLOYEE_NO      SALES
+------------- ----------
+         1002    4160045
+         1003    6295955
+         1004    2765245
+         1005    2723640
+         1006     694675
+         1008    3526265
+         1013    1468275
+         1014    4383000
+
+4. List employee number, last name, total sales, their rank based on total sales in Desc order.
+
+SELECT O.EMPLOYEE_NO, E.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES, 
+RANK() OVER ( ORDER BY SUM(SUBTOTAL) Desc) AS RANK 
+FROM ORDERS O
+JOIN  EMPLOYEE E  ON E.EMPLOYEE_NO= O.EMPLOYEE_NO
+group by O.EMPLOYEE_NO,E.LNAME;
+
+
+EMPLOYEE_NO LNAME        TOTAL_SALES       RANK
+------------- ------------ ----------- ----------
+         1036 Heisler         33658205          1
+         1070 Nabb            15282965          2
+         1042 Farmer          11520520          3
+         1038 Hanzdo          11489815          4
+         1045 Doering         11467615          5
+         1066 Bond            10280555          6
+         1022 Nabb             8070985          7
+         1054 Martin           8024410          8
+         1069 Alan             7923635          9
+         1024 Mudd             7901010         10
+
+5. Redo number 4 using DENSE rank
+ 
+SELECT O.EMPLOYEE_NO, E.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES, 
+RANK() OVER ( ORDER BY SUM(SUBTOTAL) Desc) AS RANK 
+FROM ORDERS O
+JOIN  EMPLOYEE E  ON E.EMPLOYEE_NO= O.EMPLOYEE_NO
+group by O.EMPLOYEE_NO,E.LNAME;
+
+ EMPLOYEE_NO LNAME        TOTAL_SALES       RANK
+------------- ------------ ----------- ----------
+         1036 Heisler         33658205          1
+         1070 Nabb            15282965          2
+         1042 Farmer          11520520          3
+         1038 Hanzdo          11489815          4
+         1045 Doering         11467615          5
+         1066 Bond            10280555          6
+         1022 Nabb             8070985          7
+         1054 Martin           8024410          8
+         1069 Alan             7923635          9
+         1024 Mudd             7901010         10
+
+
+
+
+
+EMPLOYEE_NO LNAME        TOTAL_SALES       RANK
+------------- ------------ ----------- ----------
+         1036 Heisler         33658205          1
+         1070 Nabb            15282965          2
+         1042 Farmer          11520520          3
+         1038 Hanzdo          11489815          4
+         1045 Doering         11467615          5
+         1066 Bond            10280555          6
+         1022 Nabb             8070985          7
+
+6. List top 25% of employees (EMPLOYEE_NO) and their total sales (highest to lowest). Use NTILE function
+
+SELECT EMPLOYEE_NO, SUM(SUBTOTAL) AS TOTAL_SALES,
+NTILE(4) OVER ( ORDER BY  SUM(SUBTOTAL) DESC NULLS LAST) Quartile
+FROM ORDERS
+GROUP BY EMPLOYEE_NO;
+
+
+ EMPLOYEE_NO TOTAL_SALES    TERTILE
+------------- ----------- ----------
+         1036    33658205          1
+         1070    15282965          1
+         1042    11520520          1
+         1038    11489815          1
+         1045    11467615          1
+         1066    10280555          1
+         1022     8070985          1
+         1054     8024410          1
+         1069     7923635          1
+         1024     7901010          1
+         1047     7553635          1
+
+ 
+7. Redo number 4 for only employees with rank higher than 4
+
+
+SELECT O.EMPLOYEE_NO, E.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES,Bottom_Ranks 
+FROM (SELECT O.EMPLOYEE_NO, E.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES, 
+RANK() OVER ( ORDER BY SUM(SUBTOTAL) Desc) AS Bottom_Ranks
+FROM ORDERS O
+JOIN  EMPLOYEE E  ON E.EMPLOYEE_NO= O.EMPLOYEE_NO
+group by O.EMPLOYEE_NO,E.LNAME),ORDERS O,EMPLOYEE E
+WHERE Bottom_Ranks >4
+group by O.EMPLOYEE_NO,E.LNAME,Bottom_Ranks;
+
+
+
+EMPLOYEE_NO LNAME        TOTAL_SALES BOTTOM_RANKS
+------------- ------------ ----------- ------------
+         1066 Wyatt           20561110            5
+         1005 Wyatt            5447280            5
+         1006 Wyatt            1389350            5
+         1016 Wyatt            2378170            5
+         1024 Wyatt           15802020            5
+         1086 Wyatt            5073930            5
+         1070 Wyatt           30565930            6
+         1003 Wyatt           12591910            6
+         1006 Wyatt            1389350            6
+         1022 Wyatt           16141970            6
+         1028 Wyatt           10580310            6
+
+
+
+
+
+
+
+
+
+                     /*Practice 2.2 Using OES4 database*/
+
+1. List customer number and their total purchase using subtotal
+
+
+SELECT  CUSTOMER_NO,SUM(SUBTOTAL)AS TOTAL_SALES FROM ORDERS
+GROUP BY CUSTOMER_NO
+ORDER BY CUSTOMER_NO;
+
+
+CUSTOMER_NO TOTAL_SALES
+----------- -----------
+       1000     5920535
+       1001     2923255
+       1003     2533725
+       1006     1583325
+       1023     2693405
+       1024      136130
+       1025      799135
+       1029      182070
+       1030      141885
+       1031       30610
+
+2. Redo number 1 using ROLL UP
+
+
+SELECT  CUSTOMER_NO,SUM(SUBTOTAL)AS TOTAL_SALES FROM ORDERS
+GROUP BY ROLLUP (CUSTOMER_NO)
+ORDER BY CUSTOMER_NO;
+
+CUSTOMER_NO TOTAL_SALES
+----------- -----------
+       1000     5920535
+       1001     2923255
+       1003     2533725
+       1006     1583325
+       1023     2693405
+       1024      136130
+       1025      799135
+       1029      182070
+       1030      141885
+
+3. Redo Number 1 using CUBE
+
+
+SELECT  CUSTOMER_NO,SUM(SUBTOTAL)AS TOTAL_SALES FROM ORDERS
+GROUP BY CUBE (CUSTOMER_NO)
+ORDER BY CUSTOMER_NO;
+
+CUSTOMER_NO TOTAL_SALES
+----------- -----------
+       1000     5920535
+       1001     2923255
+       1003     2533725
+       1006     1583325
+       1023     2693405
+       1024      136130
+       1025      799135
+       1029      182070
+       1030      141885
+       1031       30610
+
+4. List customer number, last name, total purchase, their rank based on total purchase in Desc order.
+
+
+SELECT O.CUSTOMER_NO, C.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES, 
+RANK() OVER ( ORDER BY SUM(SUBTOTAL) Desc) AS RANK 
+FROM ORDERS O
+JOIN  CUSTOMER C  ON C.CUSTOMER_NO= O.CUSTOMER_NO
+group by O.CUSTOMER_NO,C.LNAME;
+
+CUSTOMER_NO LNAME        TOTAL_SALES       RANK
+----------- ------------ ----------- ----------
+       1068 Halle           10314535          1
+       1084 Wooton           9290560          2
+       1099 James            8801415          3
+       1102 Parker           7785230          4
+       1100 David            7515490          5
+       1067 Harris           7104415          6
+       1085 Dunn             6571640          7
+       1070 Nelson           6289440          8
+       1073 Nabb             6266765          9
+       1000 Jake             5920535         10
+       1103 Adams            5360090         11
+
+5. Redo number 4 using DENSE rank 
+
+
+SELECT O.CUSTOMER_NO, C.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES, 
+DENSE_RANK() OVER ( ORDER BY SUM(SUBTOTAL) Desc) AS RANK 
+FROM ORDERS O
+JOIN  CUSTOMER C  ON C.CUSTOMER_NO= O.CUSTOMER_NO
+group by O.CUSTOMER_NO,C.LNAME;
+
+
+CUSTOMER_NO LNAME        TOTAL_SALES       RANK
+----------- ------------ ----------- ----------
+       1068 Halle           10314535          1
+       1084 Wooton           9290560          2
+       1099 James            8801415          3
+       1102 Parker           7785230          4
+       1100 David            7515490          5
+       1067 Harris           7104415          6
+       1085 Dunn             6571640          7
+       1070 Nelson           6289440          8
+       1073 Nabb             6266765          9
+       1000 Jake             5920535         10
+
+6. List top 25% of customers (customer_NO) and their total purchase (highest to lowest). Use NTILE function
+
+SELECT CUSTOMER_NO, SUM(SUBTOTAL) AS TOTAL_SALES,
+NTILE(4) OVER ( ORDER BY  SUM(SUBTOTAL) DESC NULLS LAST) Tertile
+FROM ORDERS
+GROUP BY CUSTOMER_NO;
+
+CUSTOMER_NO TOTAL_SALES    TERTILE
+----------- ----------- ----------
+       1068    10314535          1
+       1084     9290560          1
+       1099     8801415          1
+       1102     7785230          1
+       1100     7515490          1
+       1067     7104415          1
+       1085     6571640          1
+       1070     6289440          1
+       1073     6266765          1
+       1000     5920535          1
+       1103     5360090          1
+
+CUSTOMER_NO TOTAL_SALES    TERTILE
+----------- ----------- ----------
+       1098     5271665          1
+       1090     4993480          1
+       1089     4993130          1
+       1097     4878790          1
+       1082     4458425          1
+       1087     4316790          1
+       1058     4212625          1
+       1048     4104045          1
+       1040     3965555          1
+       1055     3921975          1
+       1086     3868565          1
+
+CUSTOMER_NO TOTAL_SALES    TERTILE
+----------- ----------- ----------
+       1039     3661445          1
+       1062     3615620          1
+       1078     3445260          1
+       1128     3387340          1
+       1041     3328940          1
+
+
+7. Redo number 4 for only customers with rank higher than 4
+
+SELECT O.CUSTOMER_NO, C.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES,Bottom_Ranks 
+FROM (SELECT O.CUSTOMER_NO, C.LNAME , SUM(SUBTOTAL) AS TOTAL_SALES, 
+RANK() OVER ( ORDER BY SUM(SUBTOTAL) Desc) AS Bottom_Ranks
+FROM ORDERS O
+JOIN  CUSTOMER C  ON C.CUSTOMER_NO= O.CUSTOMER_NO
+group by O.CUSTOMER_NO,C.LNAME),ORDERS O,CUSTOMER C
+WHERE Bottom_Ranks >4
+group by O.CUSTOMER_NO,C.LNAME,Bottom_Ranks; 
+
+
+CUSTOMER_NO LNAME        TOTAL_SALES BOTTOM_RANKS
+----------- ------------ ----------- ------------
+       1046 Yuvraj            469775           38
+       1039 Doering          7322890           23
+       1078 Albright         3445260           60
+       1115 Gelle            1035970           36
+       1099 Bond             8801415            8
+       1100 Ramond           7515490           35
+       1037 Thomas           1713580           75
+       1090 Claggett         4993480           49
+       1031 Stewart            30610           15
+       1102 Bixler          23355690           43
+       1052 Constable          84895           41

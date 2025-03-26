@@ -1,0 +1,266 @@
+--1. Query 1: List the book code and book title for books of type FIC, MYS, and ART, and order the books by title.
+
+SELECT BOOK_CODE, TITLE FROM BOOK
+WHERE TYPE IN( 'FIC','MYS','ART')
+ORDER BY TITLE
+
+138X	Beloved                                 
+5790	Catch-22                                
+7405	East of Eden                            
+6908	Franny and Zooey                        
+6128	Jazz                                    
+3743	Nine Stories                            
+2766	Of Mice and Men                         
+079X	Second Wind                             
+9882	Slay Ride  
+
+ --Query 2: List the book code and title of each book with the type MYS and a price of less than $20. 
+
+SELECT BOOK_CODE, TITLE FROM BOOK
+WHERE TYPE = 'MYS' AND PRICE <20
+
+0808	The Edge                                
+9882	Slay Ride   
+
+--Query 3: List the book code, book title, and price of each book with a price between $10 and $20.
+
+SELECT BOOK_CODE, TITLE, PRICE FROM BOOK
+WHERE PRICE BETWEEN 10 AND 20
+
+
+1351	Dreamcatcher: A Novel                   	19.60
+138X	Beloved                                 	12.95
+2226	Harry Potter and the Prisoner of Azkaban	13.96
+2908	Electric Light                          	14.00
+3350	Group: Six People in Search of a Life   	10.40
+3906	The Soul of a New Machine               	11.16
+5790	Catch-22                                	12.00
+6128	Jazz                                    	12.95
+7405	East of Eden                            	12.95
+7443	Harry Potter and the Goblet of Fire     	18.16   
+
+--Query 4: List the name of each publisher containing the word " and ".
+
+SELECT PUBLISHER_NAME FROM PUBLISHER
+WHERE PUBLISHER_NAME LIKE  '%___and%'  
+
+Farrar Straus and Giroux 
+McPherson and Co.        
+Simon and Schuster       
+Thames and Hudson        
+
+--Query 5: List the book code for books without a title.   
+
+SELECT BOOK_CODE FROM BOOK
+WHERE TITLE = NULL
+
+no rows selected
+
+--Query 6: List the book code, book title, and book price.  Order the books alphabetically and then by descending order of price.
+
+SELECT BOOK_CODE,TITLE, PRICE FROM BOOK
+ORDER BY PRICE DESC,TITLE ASC
+
+669X	A Guide to SQL                          	37.95
+079X	Second Wind                             	24.95
+0378	Venice                                  	24.50
+1382	Treasure Chests                         	24.46
+2281	Van Gogh and Gauguin                    	21.00
+1351	Dreamcatcher: A Novel                   	19.60
+9611	Black House                             	18.81
+7443	Harry Potter and the Goblet of Fire     	18.16
+9931	To Kill a Mockingbird                   	18.00
+2908	Electric Light                          	14.00
+
+
+--Query 7: List the count of distinct book types.
+
+SELECT  COUNT(DISTINCT TYPE) FROM BOOK
+
+12
+
+--Query 8: List the distinct book type and average book price for that type, further for only books in paperback, grouped by book type.
+
+SELECT DISTINCT TYPE,AVG(PRICE) Average_Price FROM BOOK
+WHERE PAPERBACK = 'Y'
+GROUP BY TYPE
+
+CMP	37.950000
+FIC	9.897500
+HIS	9.600000
+HOR	7.990000
+MYS	6.990000
+PHI	14.000000
+PSY	8.345000
+SCI	11.160000
+SFI	7.190000
+TRA	7.950000
+
+
+--Query 10: List the book type and average book price for paperback books having an average book price greater than $10.
+
+
+SELECT DISTINCT TYPE,AVG(PRICE) AVERAGE_PRICE FROM BOOK
+WHERE PAPERBACK = 'Y'
+GROUP BY TYPE
+HAVING AVG(PRICE) > 10
+
+CMP	37.950000
+PHI	14.000000
+SCI	11.160000
+
+
+--Query 11: By using subquery, list the author last name, and first name for authors who have written books that were published in Boston.
+
+SELECT  A.AUTHOR_LAST,A.AUTHOR_FIRST FROM AUTHOR A
+INNER JOIN WROTE W ON W.AUTHOR_NUM=A.AUTHOR_NUM
+INNER JOIN BOOK B ON W.BOOK_CODE = B.BOOK_CODE
+INNER JOIN PUBLISHER P ON P.PUBLISHER_CODE=B.PUBLISHER_CODE
+WHERE P.CITY = 'Boston'
+
+
+Solotaroff  	Paul      
+Pratt       	Philip    
+
+--Query 12: By using subquery, list the book title and price of the least expensive books.
+
+SELECT TITLE, PRICE FROM BOOK
+WHERE PRICE IN (SELECT MIN(PRICE) FROM BOOK)
+
+Nine Stories                            	5.99
+Franny and Zooey                        	5.99
+The Catcher in the Rye                  	5.99
+
+
+--Query 13: By using subquery, list the book code and title for books that are published in New York.
+
+SELECT B.BOOK_CODE,B.TITLE FROM BOOK B
+INNER JOIN PUBLISHER P ON P.PUBLISHER_CODE=B.PUBLISHER_CODE
+WHERE P.CITY = 'New York'
+
+0180	A Deepness in the Sky                   
+0189	Magic Terror                            
+0200	The Stranger                            
+0378	Venice                                  
+079X	Second Wind                             
+0808	The Edge                                
+1351	Dreamcatcher: A Novel                   
+138X	Beloved                                 
+2226	Harry Potter and the Prisoner of Azkaban
+2766	Of Mice and Men                         
+
+
+--Query 14: By using subquery, list the book code, title, and price whose price is larger than at least one book of type FIC.
+
+SELECT BOOK_CODE, TITLE, PRICE FROM BOOK
+WHERE PRICE >(SELECT MIN(PRICE) FROM BOOK WHERE TYPE = 'FIC')
+
+
+0180	A Deepness in the Sky                   	7.19
+0189	Magic Terror                            	7.99
+0200	The Stranger                            	8.00
+0378	Venice                                  	24.50
+079X	Second Wind                             	24.95
+0808	The Edge                                	6.99
+1351	Dreamcatcher: A Novel                   	19.60
+1382	Treasure Chests                         	24.46
+138X	Beloved                                 	12.95
+2226	Harry Potter and the Prisoner of Azkaban	13.96
+
+
+--Query 15: By using subquery, list the book code, title, and price whose price is larger than the price of every book of type FIC.
+
+SELECT BOOK_CODE,TITLE, PRICE FROM BOOK
+WHERE PRICE >(SELECT MAX(PRICE) FROM BOOK WHERE TYPE = 'FIC')
+
+0378	Venice                                  	24.50
+079X	Second Wind                             	24.95
+1351	Dreamcatcher: A Novel                   	19.60
+1382	Treasure Chests                         	24.46
+2281	Van Gogh and Gauguin                    	21.00
+669X	A Guide to SQL                          	37.95
+7443	Harry Potter and the Goblet of Fire     	18.16
+9611	Black House                             	18.81
+
+
+
+--Query 16: By using JOIN, list each author's last name, and number of books they've written.
+
+SELECT A.AUTHOR_LAST,COUNT(W.AUTHOR_NUM) AS NUM_OF_BOOKS FROM AUTHOR A
+JOIN WROTE W ON W.AUTHOR_NUM=A.AUTHOR_NUM
+GROUP BY A.AUTHOR_LAST
+
+Ambrose     	1
+Camus       	2
+Chase       	1
+Collins     	1
+Collins, Jr.	1
+Francis     	3
+Heaney      	1
+Heller      	1
+Hofstadter  	1
+
+
+
+--Query 17: By using JOIN, list the book code and book title for each book located in branch number 2 and written by author number 20.
+
+
+SELECT B.BOOK_CODE, B.TITLE FROM BOOK B
+ JOIN INVENTORY I ON I.BOOK_CODE=B.BOOK_CODE
+ JOIN WROTE W ON B.BOOK_CODE = W.BOOK_CODE
+ JOIN AUTHOR A ON A.AUTHOR_NUM = W.AUTHOR_NUM
+ JOIN BRANCH BR ON BR.BRANCH_NUM = I.BRANCH_NUM 
+WHERE BR.BRANCH_NUM = 2 AND A.AUTHOR_NUM = 20
+
+
+9701	The Grapes of Wrath     
+
+
+
+--Query 18: By using JOIN, list the author's number, last name, and number of books they've written.
+
+SELECT A.AUTHOR_NUM,A.AUTHOR_LAST,COUNT(W.AUTHOR_NUM) AS NUM_OF_BOOKS FROM AUTHOR A
+ JOIN WROTE W ON W.AUTHOR_NUM=A.AUTHOR_NUM
+GROUP BY A.AUTHOR_NUM,A.AUTHOR_LAST
+
+
+1	Morrison    	3
+2	Solotaroff  	1
+3	Vintage     	1
+4	Francis     	3
+5	Straub      	2
+6	King        	2
+7	Pratt       	1
+8	Chase       	1
+9	Collins     	1
+10	Heller      	1
+
+
+
+--Query 19: By using Left Outer Join, list all book code avaialable in branch 3 as wells book codes that are not available in branch 3. 
+
+SELECT I.BOOK_CODE FROM INVENTORY I 
+LEFT JOIN BRANCH B ON B.BRANCH_NUM = I.BRANCH_NUM
+WHERE B.BRANCH_NUM = 3 OR B.BRANCH_NUM != 3
+
+
+0378
+079X
+1351
+2226
+2766
+3906
+6128
+7405
+8092
+9627
+
+
+--Query 20: List all book codes with more than two autohors.
+
+SELECT BOOK_CODE,COUNT(AUTHOR_NUM) more_than_two_autohors  FROM WROTE
+GROUP BY BOOK_CODE
+HAVING COUNT(AUTHOR_NUM)>2
+
+no rows selected                
+                 

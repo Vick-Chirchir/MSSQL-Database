@@ -1,0 +1,359 @@
+1.CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE DEPARTMENT TABLE 
+
+create table Department(
+  DNO    varchar   (5) primary key not null,
+  dname    varchar    (50)not null,
+  st_addr    varchar    (25),
+  city    varchar    (25),
+  state    char    (2),
+  zip    varchar    (10),
+  phone    varchar    (12)not null,
+  budget    number    (10,2)
+);
+
+
+INSERT INTO department VALUES ('d5','Chemistry','1000 Trafton Street','Mankato','MN',56002,5073892201,1600000);
+INSERT INTO department VALUES ('d11','Comp Science','1231 Pine Street','Mankato','MN',56002,5073895968,1500000);
+INSERT INTO department VALUES ('d9','English','1256 Highland Ave','Mankato','MN',56002,5073891900,650000);
+INSERT INTO department VALUES ('d14','Mathematics','1500 Pine Street','Mankato','MN',56002,5073891646,1300000);
+
+ select*from DEPARTMENT;
+
+d5	Chemistry	1000 Trafton Street	Mankato	MN	56002	5073892201	1600000
+d11	Comp Science	1231 Pine Street	Mankato	MN	56002	5073895968	1500000
+d9	English	1256 Highland Ave	Mankato	MN	56002	5073891900	650000
+d14	Mathematics	1500 Pine Street	Mankato	MN	56002	5073891646	1300000
+
+
+
+2. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE TEACHER_RANK TABLE
+
+Create Table Teacher_Rank(
+  RankID VARCHAR(5) primary key not null,
+  Rank_Title VARCHAR(50)  not null
+  );
+
+INSERT INTO Teacher_Rank  VALUES (1,'professor');
+INSERT INTO Teacher_Rank  VALUES (2,'Associate Professor');
+INSERT INTO Teacher_Rank  VALUES (3,'Assistant Professor');
+INSERT INTO Teacher_Rank  VALUES (4,'Instructor');
+INSERT INTO Teacher_Rank  VALUES (5,'Adjunct');
+INSERT INTO Teacher_Rank  VALUES (6,'Teaching_Assitant');
+
+ select* from TEACHER_RANK;
+
+RANKI RANK_TITLE                                       
+----- --------------------------------------------------
+1     professor                                         
+2     Associate Professor                               
+3     Assistant Professor                               
+4     Instructor                                        
+5     Adjunct                                           
+6     Teaching_Assitant                                 
+
+ 6 rows selected
+
+
+
+3. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE TEACHER TABLE
+
+ create table teacher(
+  tnumb VARCHAR2(15) primary key not null,
+  fname VARCHAR2(20) not null,
+  lname VARCHAR2(20) not null, 
+  sex CHAR(1),  
+  officeNO VARCHAR(10),
+  phone VARCHAR2(20), 
+  DNO VARCHAR2(10),
+  FOREIGN KEY ( DNO) REFERENCES department (DNO)
+  );
+
+INSERT INTO Teacher VALUES ('t96','Tom','Jones','m','w102',5073891211,'d5');
+INSERT INTO Teacher VALUES ('t21','Blake','Johnson','m','w104',5073897211,'d11');
+INSERT INTO Teacher VALUES ('t79','Tom','Green','m','s200',5073899291,'d11');
+INSERT INTO Teacher VALUES ('t42','Marry','Green','f','y167',5073891219,'d11');
+INSERT INTO Teacher VALUES ('t5','Lee','Smith','m','y150',5073894657,'d9');
+INSERT INTO Teacher VALUES ('t9','Sue','Sun','f','w200',5073892341,'d14');
+INSERT INTO Teacher VALUES ('t75','Jennifer','Black','f','s300',5073894432,'d11');
+INSERT INTO Teacher VALUES ('t100','Jennifer','sink','f','w300',5073894444,'d11');
+
+col tnumb for a12
+col fname for a12
+col lname for a12
+col phone for a12
+select * from TEACHER;
+
+TNUMB        FNAME        LNAME        S OFFICENO   PHONE        DNO      
+------------ ------------ ------------ - ---------- ------------ ----------
+t96          Tom          Jones        m w102       5073891211   d5        
+t21          Blake        Johnson      m w104       5073897211   d11       
+t79          Tom          Green        m s200       5073899291   d11       
+t42          Marry        Green        f y167       5073891219   d11       
+t5           Lee          Smith        m y150       5073894657   d9        
+t9           Sue          Sun          f w200       5073892341   d14       
+t75          Jennifer     Black        f s300       5073894432   d11       
+t100         Jennifer     sink         f w300       5073894444   d11       
+
+ 8 rows selected 
+
+
+4. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE STUDENT TABLE
+ 
+  create table student(
+  snumb VARCHAR2(10) primary key not null,
+  Last_name VARCHAR2(20) not null,
+	major VARCHAR2(20),
+  minor VARCHAR2(20),  
+  advisor_tnumb VARCHAR2(5),   
+  sex CHAR(1) not null,
+  FOREIGN KEY (advisor_tnumb) REFERENCES teacher (tnumb) 
+  );
+
+
+INSERT INTO STUDENT VALUES ('S234','Thompson','mkt','comp-sci','t96','f');
+--INSERT INTO STUDENT VALUES ('S567','Black','eet','math','t82','f');
+INSERT INTO STUDENT VALUES ('S567','Black','eet','math','','f');
+INSERT INTO STUDENT VALUES ('S100','Smith','mgt','finance','t5','f');
+--INSERT INTO STUDENT VALUES ('S123','Smith','comp-sci','acct','t98','m');
+INSERT INTO STUDENT VALUES ('S123','Smith','comp-sci','acct','','m');
+INSERT INTO STUDENT VALUES ('S678','James','comp-sci','mkt','t96','m');
+--INSERT INTO STUDENT VALUES ('S345','Young','comp-sci','math','t82','m');
+INSERT INTO STUDENT VALUES ('S345','Young','comp-sci','math','','m');
+INSERT INTO STUDENT VALUES ('S124','Jones','acct','mgt','t42','f');
+INSERT INTO STUDENT VALUES ('S200','Jhonson','comp-sci','math','t21','m');
+--INSERT INTO STUDENT VALUES ('S456','Green','math','comp-sci','t98','m');
+INSERT INTO STUDENT VALUES ('S456','Green','math','comp-sci','','m');
+
+col major for a12
+col minor for a12
+select * from STUDENT;
+
+SNUMB      LAST_NAME            MAJOR        MINOR        ADVIS S
+---------- -------------------- ------------ ------------ ----- -
+S234       Thompson             mkt          comp-sci     t96   f
+S100       Smith                mgt          finance      t5    f
+S678       James                comp-sci     mkt          t96   m
+S124       Jones                acct         mgt          t42   f
+S200       Jhonson              comp-sci     math         t21   m
+S567       Black                eet          math               f
+S345       Young                comp-sci     math               m
+S123       Smith                comp-sci     acct               m
+S456       Green                math         comp-sci           m
+
+ 9 rows selected 
+
+
+5. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE COURSE TABLE
+
+ create table Course(
+  cnumb    varchar (10) primary key NOT NULL,
+  cname    varchar    (30)NOT NULL,
+  cr_hrs    number    (2)NOT NULL,
+  D#    varchar    (5)NOT NULL,
+ FOREIGN KEY (D#) REFERENCES department(DNO)
+ );
+
+INSERT INTO Course VALUES ('chem102','Chemistry I',4,'d5');
+INSERT INTO Course VALUES ('cs121','Intro to Computers',3,'d11');
+INSERT INTO Course VALUES ('cs256','Intro to System A&D',4,'d11');
+INSERT INTO Course VALUES ('cs356','System A&D',5,'d11');
+INSERT INTO Course VALUES ('cs358','Intro to DBMS',4,'d11');
+INSERT INTO Course VALUES ('cs458','DBMS I',4,'d11');
+INSERT INTO Course VALUES ('cs459','DBMS II',4,'d11');
+INSERT INTO Course VALUES ('cs468','4GL & Prototyping',4,'d11');
+INSERT INTO Course VALUES ('cs659','Advance DBase System',4,'d11');
+INSERT INTO Course VALUES ('eng102','English I',4,'d9');
+INSERT INTO Course VALUES ('math201','Mathematics I',5,'d14');
+
+SELECT * FROM COURSE;
+
+CNUMB      CNAME                              CR_HRS D#  
+---------- ------------------------------ ---------- -----
+chem102    Chemistry I                             4 d5   
+cs121      Intro to Computers                      3 d11  
+cs358      Intro to DBMS                           4 d11  
+cs458      DBMS I                                  4 d11  
+cs459      DBMS II                                 4 d11  
+cs256      Intro to System A&D                     4 d11  
+cs356      System AD                               5 d11  
+cs468      4GL Prototyping                         4 d11  
+cs659      Advance DBase System                    4 d11  
+eng102     English I                               4 d9   
+math201    Mathematics I                           5 d14  
+
+ 11 rows selected 
+ 
+
+6. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE RANK_SAL_RANGE TABLE
+
+Create Table Rank_Sal_Range(
+  RankID	varchar	(5)	primary key	not null,
+  start_Amt	number	(10)		not null,
+  End_Amt	number	(10)		not null,
+  FOREIGN KEY (RankID) REFERENCES TEACHER_RANK(RankID)
+  );
+
+
+INSERT INTO Rank_Sal_Range  VALUES (1,120000,180000);
+INSERT INTO Rank_Sal_Range  VALUES (2,100000,119900);
+INSERT INTO Rank_Sal_Range  VALUES (3,82000,99900);
+INSERT INTO Rank_Sal_Range  VALUES (4,50000,79900);
+INSERT INTO Rank_Sal_Range  VALUES (5,6000,12000);
+
+select * from RANK_SAL_RANGE;
+
+RANKI  START_AMT    END_AMT
+----- ---------- ----------
+1         120000     180000
+2         100000     119900
+3          82000      99900
+4          50000      79900
+5           6000      12000
+
+
+7. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE DEPT_CHAIR TABLE
+
+Create Table Dept_Chair(
+  DNO	varchar	(5) 	not null,
+  tnumb	varchar	(5)		not null,
+  start_date	date,			
+  end_date	date,
+  CONSTRAINT Dept_Chair_PK primary key (DNO,tnumb,start_date),
+  CONSTRAINT Dept_ChairFK1 FOREIGN KEY (tnumb) REFERENCES TEACHER(tnumb),
+  CONSTRAINT Dept_ChairFK2 FOREIGN KEY (DNO) REFERENCES DEPARTMENT(DNO)
+);
+
+
+INSERT INTO DEPT_CHAIR VALUES ('d11','t21','1-Sep-2002','30-Aug-2011');
+INSERT INTO DEPT_CHAIR VALUES ('d11','t79','1-Sep-2011','30-Aug-2014');
+INSERT INTO DEPT_CHAIR VALUES ('d11','t42','1-Sep-2012','30-Aug-2018');
+INSERT INTO DEPT_CHAIR VALUES ('d11','t75','1-Sep-2018','');
+INSERT INTO DEPT_CHAIR VALUES ('d14','t9','1-Sep-2013','');
+INSERT INTO DEPT_CHAIR VALUES ('d5','t96','1-Sep-2002','');
+INSERT INTO DEPT_CHAIR VALUES ('d9','t5','1-Sep-2008','');
+
+select*from DEPT_CHAIR;
+
+DNO   TNUMB START_DATE END_DATE
+----- ----- ---------- ---------
+d11   t21   01-SEP-02  30-AUG-11
+d11   t79   01-SEP-11  30-AUG-14
+d11   t42   01-SEP-12  30-AUG-18
+d11   t75   01-SEP-18           
+d14   t9    01-SEP-13           
+d5    t96   01-SEP-02           
+d9    t5    01-SEP-08           
+
+ 7 rows selected 
+           
+
+8. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE TEACHER_RANK_SALARY TABLE
+
+create Table Teacher_Rank_Salary(
+tnumb varchar(5) not null,
+RankID	varchar	(5)	not null,
+Sal_Amt number (10) not null,
+end_Date	Date,
+Start_Date	Date		not null,
+CONSTRAINT Teacher_Rank_Salary_PK primary key (tnumb,RankID,start_date),
+CONSTRAINT Teacher_Rank_Salary_FK1 FOREIGN KEY (tnumb) REFERENCES Teacher(tnumb),
+CONSTRAINT Teacher_Rank_Salary_FK2 FOREIGN KEY (RankID) REFERENCES Teacher_Rank(RankID)
+);
+
+
+INSERT INTO Teacher_Rank_Salary VALUES ('t96',1,120000,'','01-Jan-20');
+INSERT INTO Teacher_Rank_Salary VALUES ('t96',2,115000,'30-Dec-2019','13-Dec-12');
+INSERT INTO Teacher_Rank_Salary VALUES ('t96',3,92000,'12-Dec-2012','01-Sep-07');
+INSERT INTO Teacher_Rank_Salary VALUES ('t21',2,100000,'','01-Sep-18');
+INSERT INTO Teacher_Rank_Salary VALUES ('t21',3,78000,'30-Aug-2018','01-Sep-10');
+INSERT INTO Teacher_Rank_Salary VALUES ('t79',3,80000,'','01-Sep-15');
+INSERT INTO Teacher_Rank_Salary VALUES ('t42',4,60000,'','01-Jan-18');
+INSERT INTO Teacher_Rank_Salary VALUES ('t5',1,130000,'','01-Sep-17');
+INSERT INTO Teacher_Rank_Salary VALUES ('t5',2,119000,'30-Aug-2017','01-Sep-06');
+INSERT INTO Teacher_Rank_Salary VALUES ('t9',3,85000,'','01-Sep-06');
+INSERT INTO Teacher_Rank_Salary VALUES ('t75',2,105000,'','01-Sep-06');
+INSERT INTO Teacher_Rank_Salary VALUES ('t100',1,140000,'','01-Sep-16');
+
+select * from TEACHER_RANK_SALARY;
+
+TNUMB RANKI    SAL_AMT END_DATE  START_DATE
+----- ----- ---------- --------- ----------
+t96   1         120000           01-JAN-20 
+t96   2         115000 30-DEC-19 13-DEC-12 
+t96   3          92000 12-DEC-12 01-SEP-07 
+t21   2         100000           01-SEP-18 
+t21   3          78000 30-AUG-18 01-SEP-10 
+t79   3          80000           01-SEP-15 
+t42   4          60000           01-JAN-18 
+t5    1         130000           01-SEP-17 
+t5    2         119000 30-AUG-17 01-SEP-06 
+t75   2         105000           01-SEP-06 
+t100  1         140000           01-SEP-16 
+
+TNUMB RANKI    SAL_AMT END_DATE  START_DATE
+----- ----- ---------- --------- ----------
+t9    3          85000           01-SEP-06 
+
+ 12 rows selected 
+ 
+
+9. CREATE, INSERT AND SAMPLE QUERY TO SHOW LOADED DATA FOR THE ENROLLMENT TABLE
+
+CREATE TABLE Enrollment(
+cnumb    varchar    (10)not null,
+term    varchar    (2)not null,
+year    number    (5)not null,
+grade    char    (1),
+tnumb    varchar  (10) not null,
+snumb    varchar  (10) not null,
+CONSTRAINT  Enrollment_PK  PRIMARY KEY(cnumb,term,year,snumb),
+CONSTRAINT Enrollment_FK1  FOREIGN KEY(cnumb)REFERENCES COURSE(cnumb),
+CONSTRAINT Enrollment_FK2  FOREIGN KEY(tnumb)REFERENCES  TEACHER(tnumb),
+CONSTRAINT Enrollment_FK3  FOREIGN KEY(snumb)REFERENCES STUDENT(snumb)
+);
+
+
+INSERT INTO ENROLLMENT VALUES ('chem102','s',87,'c','t96','S234');
+INSERT INTO ENROLLMENT VALUES ('chem102','s',87,'b','t96','S567');
+INSERT INTO ENROLLMENT VALUES ('cs121','f',86,'d','t21','S100');
+INSERT INTO ENROLLMENT VALUES ('cs121','f',87,'b','t21','S123');
+INSERT INTO ENROLLMENT VALUES ('cs121','f',87,'a','t21','S234');
+INSERT INTO ENROLLMENT VALUES ('cs121','ss',86,'c','t21','S678');
+INSERT INTO ENROLLMENT VALUES ('cs256','s',89,'d','t21','S100');
+INSERT INTO ENROLLMENT VALUES ('cs256','s',87,'b','t21','S567');
+INSERT INTO ENROLLMENT VALUES ('cs256','ss',89,'c','t21','S678');
+INSERT INTO ENROLLMENT VALUES ('cs356','ss',88,'c','t79','S234');
+INSERT INTO ENROLLMENT VALUES ('cs356','f',88,'a','t79','S567');
+INSERT INTO ENROLLMENT VALUES ('cs358','f',86,'a','t42','S123');
+INSERT INTO ENROLLMENT VALUES ('cs358','f',86,'a','t42','S345');
+INSERT INTO ENROLLMENT VALUES ('cs458','s',89,'b','t42','S123');
+INSERT INTO ENROLLMENT VALUES ('cs458','s',88,'b','t42','S124');
+INSERT INTO ENROLLMENT VALUES ('cs458','f',86,'c','t42','S345');
+INSERT INTO ENROLLMENT VALUES ('cs459','f',87,'d','t79','S123');
+INSERT INTO ENROLLMENT VALUES ('cs459','f',87,'a','t79','S200');
+INSERT INTO ENROLLMENT VALUES ('cs468','s',89,'b','t5','S345');
+INSERT INTO ENROLLMENT VALUES ('cs468','ss',88,'d','t5','S567');
+INSERT INTO ENROLLMENT VALUES ('cs659','s',88,'a','t42','S200');
+INSERT INTO ENROLLMENT VALUES ('cs659','ss',86,'b','t42','S456');
+INSERT INTO ENROLLMENT VALUES ('eng102','f',89,'a','t9','S100');
+INSERT INTO ENROLLMENT VALUES ('eng102','f',89,'b','t9','S345');
+INSERT INTO ENROLLMENT VALUES ('math201','ss',89,'c','t75','S234');
+INSERT INTO ENROLLMENT VALUES ('math201','ss',89,'a','t75','S567');
+
+
+select * from enrollment;
+
+CNUMB      TE       YEAR G TNUMB      SNUMB    
+---------- -- ---------- - ---------- ----------
+eng102     f          89 a t9         S100      
+eng102     f          89 b t9         S345      
+math201    ss         89 c t75        S234      
+math201    ss         89 a t75        S567      
+
+ 26 rows selected 
+
+
+
+
+
+

@@ -1,0 +1,2179 @@
+
+
+														/*Stored Procedures*/
+							 
+													/*Oracle Stored Procedure*/
+
+
+
+
+Oracle Example 1: Hello from Stored Procedure	
+
+
+
+Set serveroutput on
+create or replace procedure Oracle_firstproc is
+begin
+  dbms_output.put_line ('Hello to you from Stored Procedure');
+end;
+/
+execute Oracle_firstproc ;
+drop procedure Oracle_firstproc ;
+
+
+SOLUTION
+
+Procedure ORACLE_FIRSTPROC compiled
+
+
+PL/SQL procedure successfully completed.
+
+Hello to you from Stored Procedure
+
+Procedure ORACLE_FIRSTPROC dropped.
+
+
+
+
+
+		
+Oracle Example 2: Extended version of Hello from Stored Procedure
+
+
+create or replace procedure secondproc is
+begin
+  dbms_output.put_line ('**********************************');
+  dbms_output.put_line ('***     Named Procedure        ***');
+  dbms_output.put_line('*** Today date is '||sysdate||'  *****');
+  dbms_output.put_line ('**********************************');
+end;
+/
+execute secondproc ;
+drop procedure secondproc ;
+
+SOLUTION
+
+PL/SQL procedure successfully completed.
+
+**********************************
+***     Named Procedure        ***
+*** Today date is 06-OCT-22  *****
+**********************************
+
+Procedure SECONDPROC dropped.
+
+
+Oracle Example 3: procedure lists the staffs of a specific branch
+
+create or replace procedure list_emp (city1 in varchar) is
+begin
+for a in (select e.lname, e.fname, e.dob 
+from employee e 
+where upper(e.city) = upper(city1) )
+      loop
+        dbms_output.put_line('Name='||a.lname||' '||a.fname);
+       dbms_output.put_line('DOB='||a.dob);
+      end loop;
+end;
+/
+exec list_emp('Mankato');
+drop procedure list_emp;
+
+
+
+
+SOLUTION
+
+
+Procedure LIST_EMP compiled
+
+
+PL/SQL procedure successfully completed.
+
+Name=Wyatt Stefan
+DOB=12-MAY-54
+Name=Wright Donald
+DOB=10-NOV-54
+Name=Wooton Bruce
+DOB=10-NOV-55
+Name=Widdes Albert
+DOB=11-MAY-56
+Name=Wehland William C.
+DOB=09-NOV-56
+Name=Thomas Patricia A.
+DOB=09-NOV-57
+Name=Stone James F.
+DOB=11-MAY-58
+Name=Stewart John C.
+
+
+Procedure LIST_EMP dropped.
+
+
+Oracle Example 4: find_oldest_staff  procedure with PROP2 schema (SP and Driver Program) with logical error
+
+create or replace procedure find_oldest_staff
+    (branchno in varchar,
+     fname out prop2.staff.fname%type,
+     lname out prop2.staff.lname%type) is
+     cursor b is select fname, lname from prop2.staff
+            where dob = (select min(dob) 
+              from prop2.staff  where lower(branchno) = lower(branchno));
+begin
+   open b; fetch b into fname, lname; close b;
+end find_oldest_staff;
+
+SOLUTION
+
+Procedure FIND_OLDEST_STAFF compiled
+
+
+---------------------------------------
+
+Set serveroutput on
+declare
+  cursor a is select * from prop2.branch;
+  a_var     a%rowtype;
+  lname     prop2.staff.lname%type;
+  fname     prop2.staff.fname%type;
+begin
+  open a;
+  fetch a into a_var;
+  while a%found loop
+     	find_oldest_staff (a_var.branchno, fname,lname);
+  	dbms_output.put_line (rpad(a_var.branchno, 8)||' '||rpad(fname, 8)||  ' '||rpad(lname, 10));
+      fetch a into a_var;
+    end loop;
+    close a;
+  end;
+
+PL/SQL procedure successfully completed.
+
+B008     Brian    Sothe     
+B009     Brian    Sothe     
+B010     Brian    Sothe 
+
+
+Oracle Example 5: find_oldest_staff  procedure with PROP2 schema (SP and Driver Program) without logical error
+
+create or replace procedure find_oldest_staff
+    (branch in varchar,
+     fname out prop2.staff.fname%type,
+     lname out prop2.staff.lname%type) is
+     cursor b is select fname, lname from prop2.staff
+            where dob = (select min(dob) 
+              from prop2.staff  
+		   where lower(branchno) = lower(branch));
+begin
+   open b; fetch b into fname, lname; close b;
+end find_oldest_staff;
+/
+
+SOLUTION
+
+Procedure FIND_OLDEST_STAFF compiled
+
+------------------------------------------
+
+Set serveroutput on
+declare
+  cursor a is select * from prop2.branch;
+  a_var     a%rowtype;
+  lname     prop2.staff.lname%type;
+  fname     prop2.staff.fname%type;
+begin
+  open a;
+  fetch a into a_var;
+  while a%found loop
+     	find_oldest_staff (a_var.branchno, fname,lname);
+  	dbms_output.put_line (rpad(a_var.branchno, 8)||' '||rpad(fname, 8)||  ' '||rpad(lname, 10));
+      fetch a into a_var;
+    end loop;
+    close a;
+  end;
+/
+
+PL/SQL procedure successfully completed.
+
+B008     Brian    Sothe     
+B009     Sheela   Johnson   
+B010     Fredo    Satin     
+
+Oracle Example 6: Declaring Stored Procedure as a TYPE but not as a persistent object with logical error
+
+declare
+   procedure Hello is
+	begin
+  		dbms_output.put_line ('Hello to you from Stored Procedure');
+	end;
+procedure list_position (position in varchar2) is
+	begin
+		for a in (select * from prop2.staff where position=position)
+      		loop
+       		dbms_output.put_line (a.position);
+      		end loop;
+	end;
+ begin
+   dbms_output.put_line ('*** Results of the first procedure');
+   hello;
+   dbms_output.put_line ('*');
+   dbms_output.put_line ('*** Results of the second procedure');
+   dbms_output.put_line ('position ');
+   dbms_output.put_line ('---------');
+   list_position('Assistant');
+   end;
+/
+
+--SOLUTION
+
+PL/SQL procedure successfully completed.
+
+*** Results of the first procedure
+Hello to you from Stored Procedure
+*
+*** Results of the second procedure
+position 
+---------
+Assistant
+Supervisor
+Assistant
+Manager
+Assistant
+Assistant
+Supervisor
+Assistant
+
+
+Oracle Example 7: Example 6: Declaring Stored Procedure as a TYPE but not as a persistent object without logical error
+
+declare
+   procedure Hello is
+	begin
+  		dbms_output.put_line ('Hello to you from Stored Procedure');
+	end;
+procedure list_position (posit in varchar2) is
+	begin
+		for a in (select * from prop2.staff where position=posit)
+      		loop
+       		dbms_output.put_line (a.position);
+      		end loop;
+	end;
+ begin
+   dbms_output.put_line ('*** Results of the first procedure');
+   hello;
+   dbms_output.put_line ('*');
+   dbms_output.put_line ('*** Results of the second procedure');
+   dbms_output.put_line ('position ');
+   dbms_output.put_line ('---------');
+   list_position('Assistant');
+   end;
+/
+
+--SOLUTION
+
+PL/SQL procedure successfully completed.
+
+*** Results of the first procedure
+Hello to you from Stored Procedure
+*
+*** Results of the second procedure
+position 
+---------
+Assistant
+Assistant
+Assistant
+Assistant
+Assistant
+
+
+Oracle Example 8: Creating two SP with the same name(List_Staff) but with different parameterss
+
+declare
+-- The first procedure that lists the staff in a specified branch
+   procedure list_staff (branch in varchar) is
+   begin
+    for a in (select lname, dob from prop2.staff where branchno = branch)
+    loop
+      dbms_output.put_line (a.lname||' '||to_char(a.dob));
+    end loop;
+    end;
+-- The first procedure that lists the staff in a specified branch after specific date
+   procedure list_staff (branch in varchar2, born in date) is
+    begin
+      for a in (select lname, dob from prop2.staff where branchno = branch and dob > born)
+    loop
+      dbms_output.put_line (a.lname||' '||to_char(a.dob));
+    end loop;
+    end;
+ begin
+     dbms_output.put_line ('Results of the first procedure');
+     list_staff('B008');
+     dbms_output.put_line ('----');
+     dbms_output.put_line ('Results of the second procedure');
+     list_staff('B008', '01-JAN-36');
+ end;
+/
+
+--SOLUTION
+
+PL/SQL procedure successfully completed.
+
+Results of the first procedure
+Smith 23-NOV-74
+Sothe 30-DEC-64
+----
+Results of the second procedure
+
+
+
+Oracle Example 9: Using OES4, this procedure finds the no. of employees in each branch
+
+
+create or replace procedure count_employee_proc 
+	(branch in number, cnt out number) is
+			cursor a is select  count(employee_no) count1 from oes4.employee where branch_no=branch;
+	a_var a%rowtype ;
+Begin
+  open a ; 
+  fetch a into a_var ;
+cnt:=a_var.count1  ;
+close a ;
+end count_employee_proc ;
+/
+
+declare 
+  	cnt1 number ;
+begin
+  	dbms_output.put_line(rpad('BRANCH NO.',12) || rpad('CITY',15)|| rpad('# OF EMPLOYEE',20));
+  	dbms_output.put_line('-------------------------------------------------');
+    	for a in (select branch_no,city from oes4.branch)
+    	loop
+        		 count_employee_proc(a.branch_no ,cnt1); -- call stored procedure
+         	dbms_output.put_line(rpad(to_char(a.branch_no),12) || rpad(a.city,15) || rpad(to_char(cnt1),20) );
+    	end loop;
+end;
+
+---SOLUTION
+
+
+Procedure COUNT_EMPLOYEE_PROC compiled
+
+
+PL/SQL procedure successfully completed.
+
+BRANCH NO.  CITY           # OF EMPLOYEE       
+-------------------------------------------------
+100         MANKATO        14                  
+101         SAINT PAUL     11                  
+102         ROCHESTER      7                   
+103         SPRINGFIELD    5                   
+104         WASHINGTON     4                   
+105         DOVER          2                   
+106         TALLAHASSEE    3                   
+107         HONOLULU       2                   
+108         JUNEAU         2                   
+109         SACRAMENTO     9                   
+110         CARSON CITY    8                   
+111         SALEM          5                   
+112         PHOENIX        6                   
+113         DENVER         7                   
+114         BOISE          5                   
+
+
+
+Oracle Example 10: Find no. of orders placed by each customer along with their first and last name
+
+
+create or replace procedure find_no_orders(custno in number , no_of_orders out number) is
+cursor a is select count(order_no)cnt from oes4.orders where customer_no=custno ;
+cur_var a%rowtype ;
+begin
+  open a ; 
+  fetch a into cur_var ; 
+  no_of_orders := cur_var.cnt ;
+  close a ; 
+end;
+/
+
+declare
+  cnt number ;
+begin
+   dbms_output.put_line(rpad('Customer_No',15) || rpad('First Name',15) || rpad('Last Name',15) ||  rpad('No. Of Orders',15) );
+   dbms_output.put_line('----------------------------------------------------------');
+   for a in (select customer_no, fname, lname from oes4.customer)
+   loop
+        find_no_orders(a.customer_no ,cnt) ;
+        dbms_output.put_line(rpad(a.customer_no,15) || rpad(a.fname,15) || rpad(a.lname,15) || rpad(to_char(cnt),15)) ; 
+   end loop ;  
+end;
+
+
+
+--SOLUTION
+
+Procedure FIND_NO_ORDERS compiled
+
+
+PL/SQL procedure successfully completed.
+
+Customer_No    First Name     Last Name      No. Of Orders  
+----------------------------------------------------------
+1000           Roerig         Jake           18             
+1023           Jensen         Maria          20             
+1060           Al             Doering        17             
+1064           Donn           Jenkins        17             
+1068           Edward         Halle          17             
+1072           Michael        Bond           17             
+1076           Catherine      Thomas         19             
+1001           Steve          Case           16             
+1024           Muhammad       Aslam          14             
+1061           Steven         Widdes         13             
+1065           Earl M.        Colson         11             
+1069           Charles        Wehland        11             
+1073           Edward         Nabb           16             
+1077           William        Miller         12             
+1003           Kashif         Aslam          16             
+1058           John           Johny          12             
+1062           Donna          McMillan       12             
+1066           Paul           Allen          12             
+1070           Macy           Nelson         12             
+1074           William        Johnson        14             
+1078           Agnes          Johnston       13             
+1006           Laral          Brin           16             
+1025           Colony         George         15             
+1059           Donald         Geriach        12
+
+
+
+													/*Stored Procedures - MSSQL Examples With Solutions*/
+													
+
+MSSQL Example 1: Hello from Stored Procedure
+
+Create or Alter procedure TSQL_firstproc  as
+begin
+	print('*************************************');
+	print('************** Hello*****************');
+end;
+go
+execute TSQL_firstproc;
+
+--SOLUTION
+
+*************************************
+************** Hello*****************
+
+Completion time: 2022-10-06T20:17:30.5157794-05:00
+
+
+MSSQL Example 2: Extended version of Hello from Stored Procedure
+
+Create procedure TSQL_SecondProc as
+begin
+	print('*************************************');
+	print('*******  Named Procedure ************');
+	print('**** Today date is ' + CAST(LEFT(GETDATE(),11) as 			varchar(20)) + ' ***');
+print('*************************************');
+end;
+go
+execute TSQL_SecondProc;
+drop procedure TSQL_SecondProc;
+
+--SOLUTION
+
+*************************************
+*******  Named Procedure ************
+**** Today date is Oct  6 2022 ***
+*************************************
+
+Completion time: 2022-10-06T20:21:25.6947422-05:00
+
+
+
+
+MSSQL Example 3: procedure lists the staffs of a specific branch
+
+CREATE PROCEDURE List_emp (@city1 VARCHAR(20)) AS
+BEGIN
+	--SET NOCOUNT ON;
+	DECLARE @LNAME VARCHAR(20), @FNAME VARCHAR(20), @DOB DATE;
+	DECLARE a CURSOR FOR 
+		SELECT e.lname, e.fname, e.dob 
+		FROM employee e 
+		WHERE upper(e.city)=upper(@city1);
+	OPEN a;
+	FETCH NEXT FROM a INTO @LNAME, @FNAME, @DOB
+	WHILE @@FETCH_STATUS=0 -- while a%found
+	BEGIN
+		PRINT 'Name= '+ISNULL(@LNAME, ' ')+' '+ISNULL(@FNAME, ' ‘);
+		PRINT 'DOB= '+ISNULL(CAST(CONVERT(DATE, @DOB) AS VARCHAR),' ‘);
+		FETCH NEXT FROM a INTO @LNAME, @FNAME, @DOB;
+	END
+	CLOSE a;
+	DEALLOCATE a;
+END;
+GO
+
+
+--Solutions*/
+
+Commands completed successfully.
+
+Completion time: 2022-10-06T20:49:27.8973470-05:00
+
+
+MSSQL Example 4: Hello from Stored Procedure with OES4 schema (SP and Driver Program)
+
+Create Procedure list_position1 (@position1 varchar(30)) 
+AS
+Begin
+   SELECT e.lname
+   FROM employee e join employee_position ep on e.position =ep.position
+   WHERE ep.description=@position1
+   print(@position1)
+END
+
+GO
+Create Procedure Hello1
+AS
+Begin
+ Print 'Hello to you from stored procedure'
+End
+GO
+
+execute Hello1
+
+--SOLUTION
+
+Hello to you from stored procedure
+
+Completion time: 2022-10-06T20:54:44.4326083-05:00
+
+
+MSSQL Example 5: Two overload procedures with the same name (hello) but diff variables
+
+Create or Alter procedure Hello (@var1 varchar(10)) as
+BEGIN
+   Print @var1
+END;
+go
+EXECUTE Hello 'Mankato';
+
+--SOLUTION
+
+Mankato
+
+Completion time: 2022-10-06T21:09:50.2570016-05:00
+
+
+Create or Alter procedure Hello (@var1 varchar(10), @var2 varchar(10)) as
+BEGIN
+   Print @var1+' '+@var2
+END;
+go
+EXECUTE Hello 'Mankato', 'MN';
+
+
+
+--SOLUTION
+
+
+Mankato MN
+
+Completion time: 2022-10-06T21:10:36.7756208-05:00
+
+
+MSSQL Example 6: Sample of a conditional procedure to check records within Customer table
+
+CREATE OR ALTER PROCEDURE ConditionalProc AS
+BEGIN
+   DECLARE @id int;
+   DECLARE @fname varchar(20);
+   BEGIN
+      SET @id = 1000
+      WHILE @id < (SELECT COUNT(CUSTOMER_NO) FROM CUSTOMER) + 1000
+      BEGIN
+         IF (SELECT FNAME FROM CUSTOMER WHERE @id = CUSTOMER_NO) LIKE 'K%'
+         BEGIN
+            SET @fname = (SELECT FNAME FROM CUSTOMER WHERE @id =CUSTOMER_NO)
+            PRINT 'The person named '+@fname+' is cool.'
+         END
+         ELSE IF (SELECT FNAME FROM CUSTOMER WHERE @id = CUSTOMER_NO) LIKE 'STEVE%'
+         BEGIN
+            SET @fname = (SELECT FNAME FROM CUSTOMER WHERE @id =CUSTOMER_NO)
+            PRINT 'The person named '+@fname+' is a nerd.'
+         END
+        ELSE
+        BEGIN
+           PRINT 'Nothing interesting was found.'
+        END
+        SET @id += 1;
+     END
+   END
+END
+
+Execute ConditionalProc
+
+
+--SOLUTION
+
+Nothing interesting was found.
+The person named Steve is a nerd.
+Nothing interesting was found.
+The person named Kashif is cool.
+Nothing interesting was found.
+Nothing interesting was found.
+Nothing interesting was found.
+Nothing interesting was found.
+Nothing interesting was found.
+Nothing interesting was found.
+Nothing interesting was found.
+
+
+											/*User Defined Functions*/
+											
+											
+UDFs Example with solutions
+Oracle Example 1: Creating a UDF (hello …) and executing by driver program
+
+--Create a function in an anonymous block
+create or replace function Hello
+  return varchar
+  is
+  begin
+     return 'Hello from Function';
+  end;
+/
+
+declare
+   a      varchar(30);
+begin
+   a := Hello;
+   dbms_output.put_line (a);
+end;
+/
+drop function Hello;
+
+
+--SOLUTION		
+
+Function HELLO compiled
+
+
+PL/SQL procedure successfully completed.
+
+Hello from Function
+
+
+Function HELLO dropped.
+
+
+	
+Oracle Example 2: Creating a UDF (hello …) and executing by a SQL program
+
+SET SERVEROUTPUT ON
+
+
+create or replace function Hello
+  return varchar
+  is
+  begin
+     return 'Hello from Function';
+  end;
+/
+
+declare
+   a      varchar(30);
+begin
+   a := Hello;
+   dbms_output.put_line (a);
+end;
+/
+
+select hello() from staff;
+
+drop function Hello;
+
+
+
+--Solutions*/
+
+Function HELLO compiled
+
+
+PL/SQL procedure successfully completed.
+
+Hello from Function
+
+
+
+Oracle Example 3: Create a UDF to calculate AGE of employees running it with SQL porgram
+
+create or replace function age (dob in date)
+  return number is
+  age   number;
+begin
+  age := trunc(months_between(sysdate, dob)/12, 0);
+  return age;
+end;
+/
+
+select lname, age(dob) as AGE
+from employee;
+
+
+--Solutions*/
+
+
+Function AGE compiled
+
+
+LNAME               AGE
+------------ ----------
+Wyatt                68
+Wright               67
+Worral               67
+Wooton               66
+Widdes               66
+Wehland              65
+Thomas               65
+Thomas               64
+Stone                64
+Stewart              63
+Stansbury            63
+
+
+Oracle Example 4: Create UDF to calculate months between today date and employee DOB
+
+create or replace function Hello
+  return varchar2 is
+  begin
+     return 'Hello from Function';
+  end;
+/
+
+create or replace function months (dob in date)
+  return number is
+  months   number;
+begin
+  months := trunc(months_between(sysdate, dob), 0);
+  return months;
+end;
+/
+Col lname for 15
+Col fname for 15
+Col month_between heading 'Month|between 'for 9999
+col employee_no heading 'employee|no 'for a11
+col function for a20
+
+select employee_no, lname, sysdate Cur_Date, months(dob) as Month_Between, dob, Hello as function
+from oes4.employee
+where rownum <10;
+
+drop function hello;
+drop function months;
+
+
+------Solutions*/
+
+Function HELLO compiled
+
+
+Function MONTHS compiled
+
+SP2-0246: Illegal FORMAT string "15"
+SP2-0246: Illegal FORMAT string "15"
+
+   employee                                Month                              
+         no LNAME        CUR_DATE        between DOB       FUNCTION           
+----------- ------------ --------- ------------- --------- --------------------
+       1000 Wyatt        07-OCT-22           820 12-MAY-54 Hello from Function 
+       1001 Wright       07-OCT-22           814 10-NOV-54 Hello from Function 
+       1002 Worral       07-OCT-22           808 12-MAY-55 Hello from Function 
+       1003 Wooton       07-OCT-22           802 10-NOV-55 Hello from Function 
+       1004 Widdes       07-OCT-22           796 11-MAY-56 Hello from Function 
+       1005 Wehland      07-OCT-22           790 09-NOV-56 Hello from Function 
+       1006 Thomas       07-OCT-22           784 11-MAY-57 Hello from Function 
+       1007 Thomas       07-OCT-22           778 09-NOV-57 Hello from Function 
+       1008 Stone        07-OCT-22           772 11-MAY-58 Hello from Function 
+
+ 9 rows selected 
+
+
+Function HELLO dropped.
+
+
+Function MONTHS dropped.
+
+
+Oracle Example 5: list alll branches and number of staff in the branch
+
+create or replace function count_staff
+     (branch in varchar2)
+      return number is
+     cursor a is select  count(staffno) tot from prop2.staff
+		where branchno=branch;
+   a_var       a%rowtype;
+   begin
+     open a;
+     fetch a into a_var;
+     if a%notfound then
+         return 'No such Branch';
+     else
+         return a_var.tot;
+     end if;
+   end;
+/
+
+select  branchno, city, count_staff(branchno) "# of Staff "
+from prop2.branch
+order by 3 desc;
+
+
+--Solutions*/
+
+Function COUNT_STAFF compiled
+
+
+BRANC CITY                                             # of Staff
+----- -------------------- ---------------------------------------
+B009  Burmingham                                                 3
+B010  Manchester                                                 3
+B008  Preston                                                    2
+
+
+
+Oracle Example 6: List every customer and their total number of orders
+	  Example 6a: do example 6 using Stored Procedure 
+	  
+CREATE OR REPLACE PROCEDURE GET_NUM_ORDERS   (CUST_NO IN OES4.CUSTOMER.CUSTOMER_NO%TYPE, TOTAL_ORDERS OUT NUMBER) IS
+  CURSOR CURS IS SELECT COUNT(*)
+	FROM OES4.ORDERS 
+	WHERE CUSTOMER_NO = CUST_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_ORDERS;
+  CLOSE CURS;
+END GET_NUM_ORDERS;
+/
+
+DECLARE
+TOTAL_ORDERS NUMBER;
+BEGIN
+  FOR A IN (SELECT CUSTOMER.CUSTOMER_NO, FNAME, LNAME FROM OES4.CUSTOMER)
+  LOOP
+    GET_NUM_ORDERS(A.CUSTOMER_NO, 	TOTAL_ORDERS);
+    DBMS_OUTPUT.PUT_LINE(A.CUSTOMER_NO || '  ' || A.FNAME || ' ' || A.LNAME || '   ' || TOTAL_ORDERS);
+  END LOOP;
+END;
+
+
+---Solutions*/
+
+Procedure GET_NUM_ORDERS compiled
+
+
+PL/SQL procedure successfully completed.
+
+1000  Roerig Jake   18
+1023  Jensen Maria   20
+1060  Al Doering   17
+1064  Donn Jenkins   17
+1068  Edward Halle   17
+1072  Michael Bond   17
+1076  Catherine Thomas   19
+1001  Steve Case   16
+1024  Muhammad Aslam   14
+1061  Steven Widdes   13
+
+
+	  Example 6b: do example 6 using User Defined Functions
+	  
+set serveroutput on;
+
+create or replace function count_orders
+     (customer1 in varchar2)
+      return number is
+    cursor a is 
+	select  count(order_no) tot
+	from oes4.orders
+	where customer_no=customer1;
+   a_var       a%rowtype;
+   begin
+     open a;
+     fetch a into a_var;
+     if a%notfound then
+         return 'No orders';
+     else
+         return a_var.tot;
+     end if;
+   end;
+/
+
+col no_orders heading "No|Orders" for 9999
+select customer_no
+      , fname
+      , lname
+      , count_orders(customer_no) No_Orders
+from oes4.customer;
+
+
+---Solutions*/
+
+Function COUNT_ORDERS compiled
+
+
+                                                                         No
+                            CUSTOMER_NO FNAME        LNAME           Orders
+--------------------------------------- ------------ ------------ ---------
+                                   1000 Roerig       Jake                18
+                                   1023 Jensen       Maria               20
+                                   1060 Al           Doering             17
+                                   1064 Donn         Jenkins             17
+                                   1068 Edward       Halle               17
+                                   1072 Michael      Bond                17
+                                   1076 Catherine    Thomas              19
+                                   1001 Steve        Case                16
+                                   1024 Muhammad     Aslam               14
+                                   1061 Steven       Widdes              13
+
+
+
+
+
+
+										MSSQL
+
+
+MSSQL Example 1: Creating a UDF (hello …) and executing by driver program
+
+create or ALTER function Hello()
+  returns varchar(4000) as
+  begin
+     return 'Hello from Function';
+  end;
+GO
+
+declare @var varchar(400)
+set @var=dbo.hello()
+print @var
+
+drop function Hello;
+
+
+--Solutions*/
+
+Hello from Function
+
+Completion time: 2022-10-07T17:54:51.9704516-05:00
+
+
+MSSQL Example 2: Creating a UDF (hello …) and executing by a SQL program
+
+create or ALTER function Hello()
+  returns varchar(4000) as
+  begin
+     return 'Hello from Function';
+  end;
+GO
+
+declare @var varchar(400)
+set @var=dbo.hello()
+print @var
+
+OR
+select dbo.hello() from staff
+drop function Hello;
+
+
+
+--Solutions*/
+
+Hello from Function
+
+Completion time: 2022-10-07T18:04:18.4526594-05:00
+
+
+
+
+MSSQL Example 3: Create a UDF to calculate AGE of employees running it with SQL 			program
+
+create function age (@dob date)
+  returns numeric as
+ begin
+  	declare @age   float;
+ 
+  	set @age = DateDiff(year,@dob, GETDATE());
+  	return @age;
+end;
+GO
+
+select lname, dbo.age(dob) as AGE, dob
+from employee;
+
+
+--SOLUTION
+
+Wyatt	68	1954-05-12
+Wright	68	1954-11-10
+Worral	67	1955-05-12
+Wooton	67	1955-11-10
+Widdes	66	1956-05-11
+Wehland	66	1956-11-09
+Thomas	65	1957-05-11
+Thomas	65	1957-11-09
+
+
+MSSQL Example 4: Create UDF to calculate months between today date and 
+		employee DOB
+		
+create function Hello()
+  returns varchar(4000) as
+  begin
+     return 'Hello from Function';
+  end;
+GO
+
+drop function Hello;
+create function months (@dob datetime)
+  returns float as
+ begin
+  declare @months   float;
+ 
+  set @months = DateDiff(Month, @dob, getdate());
+  return @months;
+end;
+GO
+
+drop function months;
+
+select top(9) employee_no, lname, getdate() "Cur Date", dbo.months(dob) as "Month Between", dob, dbo.Hello() as [function]
+from employee;
+
+
+--Solutions*/
+
+
+1000	Wyatt	2022-10-07 19:28:14.630	5	1954-05-12	Hello from Function
+1001	Wright	2022-10-07 19:28:14.630	11	1954-11-10	Hello from Function
+1002	Worral	2022-10-07 19:28:14.630	5	1955-05-12	Hello from Function
+1003	Wooton	2022-10-07 19:28:14.630	11	1955-11-10	Hello from Function
+1004	Widdes	2022-10-07 19:28:14.630	5	1956-05-11	Hello from Function
+1005	Wehland	2022-10-07 19:28:14.630	11	1956-11-09	Hello from Function
+1006	Thomas	2022-10-07 19:28:14.630	5	1957-05-11	Hello from Function
+1007	Thomas	2022-10-07 19:28:14.630	11	1957-11-09	Hello from Function
+1008	Stone	2022-10-07 19:28:14.630	5	1958-05-11	Hello from Function
+		
+		
+MSSQL Example 5: list all branches and number of staff in the branch
+
+
+create function count_staff(@branch varchar(4000))
+      returns varchar as
+ begin
+    declare a cursor local for select count(staffno)
+		from staff
+		where branchno=@branch;
+   declare @a_var_tot varchar(4000)
+     open a;
+     fetch a into @a_var_tot;
+     if @@fetch_status = 0 
+	 begin
+         return @a_var_tot;
+     end
+     else begin
+         return '0';
+     end 
+     return null;
+   end;
+GO
+
+drop function count_staff;
+
+select  branchno, city, dbo.count_staff(branchno) "# of Staff "
+from branch
+order by 3 desc;
+
+
+--Solutions*/
+
+B009	Burmingham	3
+B010	Manchester	3
+B008	Preston	2
+
+
+
+
+
+										Develop a similar example using a different database
+													/*Oracle Stored Procedure*/
+
+
+
+
+Oracle Example 1: Hello from Stored Procedure	
+
+
+
+Set serveroutput on
+create or replace procedure Oracle_firstproc is
+begin
+  dbms_output.put_line ('Hello to you from Stored Procedure');
+end;
+/
+execute Oracle_firstproc ;
+drop procedure Oracle_firstproc ;
+
+
+SOLUTION
+
+Procedure ORACLE_FIRSTPROC compiled
+
+
+PL/SQL procedure successfully completed.
+
+Hello to you from Stored Procedure
+
+Procedure ORACLE_FIRSTPROC dropped.
+
+
+
+
+
+		
+Oracle Example 2: Extended version of Hello from Stored Procedure
+
+
+create or replace procedure secondproc is
+begin
+  dbms_output.put_line ('**********************************');
+  dbms_output.put_line ('***     Named Procedure        ***');
+  dbms_output.put_line('*** Today date is '||sysdate||'  *****');
+  dbms_output.put_line ('**********************************');
+end;
+/
+execute secondproc ;
+drop procedure secondproc ;
+
+SOLUTION
+
+PL/SQL procedure successfully completed.
+
+**********************************
+***     Named Procedure        ***
+*** Today date is 06-OCT-22  *****
+**********************************
+
+Procedure SECONDPROC dropped.
+
+
+Oracle Example 3: procedure lists the staffs of a specific branch (OES2)
+
+Set serveroutput on
+create or replace procedure list_emp (city1 in varchar) is
+begin
+for a in (select e.lname, e.fname, e.dob 
+from OES2.employee e 
+where upper(e.city) = upper(city1) )
+      loop
+        dbms_output.put_line('Name='||a.lname||' '||a.fname);
+       dbms_output.put_line('DOB='||a.dob);
+      end loop;
+end;
+/
+exec list_emp('Mankato');
+drop procedure list_emp;
+
+
+
+SOLUTION
+
+
+Procedure LIST_EMP compiled
+
+
+PL/SQL procedure successfully completed.
+
+Name=Wyatt  Stefan
+DOB=12-MAY-54
+Name=Wright Donald
+DOB=10-NOV-54
+Name=Wooton Bruce
+DOB=10-NOV-55
+
+
+Procedure LIST_EMP dropped.
+
+
+
+
+Oracle Example 4: find_oldest_staff  procedure with PROP2 schema (SP and Driver Program) with logical error (PROP)
+
+create or replace procedure find_oldest_staff
+    (branchno in varchar,
+     fname out prop.staff.fname%type,
+     lname out prop.staff.lname%type) is
+     cursor b is select fname, lname from prop.staff
+            where dob = (select min(dob) 
+              from prop.staff  where lower(branchno) = lower(branchno));
+begin
+   open b; fetch b into fname, lname; close b;
+end find_oldest_staff;
+
+
+
+
+---------------------------------------
+
+Set serveroutput on
+declare
+  cursor a is select * from prop.branch;
+  a_var     a%rowtype;
+  lname     prop.staff.lname%type;
+  fname     prop.staff.fname%type;
+begin
+  open a;
+  fetch a into a_var;
+  while a%found loop
+     	find_oldest_staff (a_var.branchno, fname,lname);
+  	dbms_output.put_line (rpad(a_var.branchno, 8)||' '||rpad(fname, 8)||  ' '||rpad(lname, 10));
+      fetch a into a_var;
+    end loop;
+    close a;
+  end;
+  
+
+--Solutions*/
+
+
+Procedure FIND_OLDEST_STAFF compiled
+
+PL/SQL procedure successfully completed.
+
+B005     David    Ford      
+B007     David    Ford      
+B003     David    Ford      
+B004     David    Ford      
+B002     David    Ford      
+
+
+
+Oracle Example 5: find_oldest_staff  procedure with PROP2 schema (SP and Driver Program) without logical error(PROP)
+
+create or replace procedure find_oldest_staff
+    (branch in varchar,
+     fname out prop.staff.fname%type,
+     lname out prop.staff.lname%type) is
+     cursor b is select fname, lname from prop.staff
+            where dob = (select min(dob) 
+              from prop.staff  
+		   where lower(branchno) = lower(branch));
+begin
+   open b; fetch b into fname, lname; close b;
+end find_oldest_staff;
+/
+
+
+------------------------------------------
+
+Set serveroutput on
+declare
+  cursor a is select * from prop.branch;
+  a_var     a%rowtype;
+  lname     prop.staff.lname%type;
+  fname     prop.staff.fname%type;
+begin
+  open a;
+  fetch a into a_var;
+  while a%found loop
+     	find_oldest_staff (a_var.branchno, fname,lname);
+  	dbms_output.put_line (rpad(a_var.branchno, 8)||' '||rpad(fname, 8)||  ' '||rpad(lname, 10));
+      fetch a into a_var;
+    end loop;
+    close a;
+  end;
+/
+
+--Solutions*/
+
+
+Procedure FIND_OLDEST_STAFF compiled
+
+
+PL/SQL procedure successfully completed.
+
+B005      
+B007     Julie    Lee       
+B003     David    Ford      
+B004      
+B002      
+
+
+Oracle Example 6: Declaring Stored Procedure as a TYPE but not as a persistent object with logical error(PROP)
+
+declare
+   procedure Hello is
+	begin
+  		dbms_output.put_line ('Hello to you from Stored Procedure');
+	end;
+procedure list_position (position in varchar2) is
+	begin
+		for a in (select * from prop.staff where position=position)
+      		loop
+       		dbms_output.put_line (a.position);
+      		end loop;
+	end;
+ begin
+   dbms_output.put_line ('*** Results of the first procedure');
+   hello;
+   dbms_output.put_line ('*');
+   dbms_output.put_line ('*** Results of the second procedure');
+   dbms_output.put_line ('position ');
+   dbms_output.put_line ('---------');
+   list_position('Assistant');
+   end;
+/
+
+
+--SOLUTION
+
+PL/SQL procedure successfully completed.
+
+*** Results of the first procedure
+Hello to you from Stored Procedure
+*
+*** Results of the second procedure
+position 
+---------
+Manager
+Assistant
+Supervisor
+Assistant
+Manager
+Assistant
+
+Oracle Example 7: Example 6: Declaring Stored Procedure as a TYPE but not as a persistent object without logical error(PROP)
+
+declare
+   procedure Hello is
+	begin
+  		dbms_output.put_line ('Hello to you from Stored Procedure');
+	end;
+procedure list_position (posit in varchar2) is
+	begin
+		for a in (select * from prop.staff where position=posit)
+      		loop
+       		dbms_output.put_line (a.position);
+      		end loop;
+	end;
+ begin
+   dbms_output.put_line ('*** Results of the first procedure');
+   hello;
+   dbms_output.put_line ('*');
+   dbms_output.put_line ('*** Results of the second procedure');
+   dbms_output.put_line ('position ');
+   dbms_output.put_line ('---------');
+   list_position('Assistant');
+   end;
+/
+
+--SOLUTION
+
+PL/SQL procedure successfully completed.
+
+*** Results of the first procedure
+Hello to you from Stored Procedure
+*
+*** Results of the second procedure
+position 
+---------
+Assistant
+Assistant
+Assistant
+
+Oracle Example 8: Creating two SP with the same name(List_Staff) but with different parameterss(PROP)
+
+
+SET SERVEROUTPUT ON;
+declare
+-- The first procedure that lists the staff in a specified branch
+   procedure list_staff (branch in varchar) is
+   begin
+    for a in (select lname, dob from prop.staff where branchno = branch)
+    loop
+      dbms_output.put_line (a.lname||' '||to_char(a.dob));
+    end loop;
+    end;
+-- The first procedure that lists the staff in a specified branch after specific date
+   procedure list_staff (branch in varchar2, born in date) is
+    begin
+      for a in (select lname, dob from prop.staff where branchno = branch and dob > born)
+    loop
+      dbms_output.put_line (a.lname||' '||to_char(a.dob));
+    end loop;
+    end;
+ begin
+     dbms_output.put_line ('Results of the first procedure');
+     list_staff('B008');
+     dbms_output.put_line ('----');
+     dbms_output.put_line ('Results of the second procedure');
+     list_staff('B008', '01-JAN-36');
+ end;
+/
+
+--SOLUTION
+PL/SQL procedure successfully completed.
+
+Results of the first procedure
+----
+Results of the second procedure
+
+
+Oracle Example 9: Using OES4, this procedure finds the no. of employees in each branch(OES2)
+
+
+create or replace procedure count_employee_proc 
+	(branch in number, cnt out number) is
+			cursor a is select  count(employee_no) count1 from oes2.employee where branch_no=branch;
+	a_var a%rowtype ;
+Begin
+  open a ; 
+  fetch a into a_var ;
+cnt:=a_var.count1  ;
+close a ;
+end count_employee_proc ;
+/
+
+declare 
+  	cnt1 number ;
+begin
+  	dbms_output.put_line(rpad('BRANCH NO.',12) || rpad('CITY',15)|| rpad('# OF EMPLOYEE',20));
+  	dbms_output.put_line('-------------------------------------------------');
+    	for a in (select branch_no,city from oes2.branch)
+    	loop
+        		 count_employee_proc(a.branch_no ,cnt1); -- call stored procedure
+         	dbms_output.put_line(rpad(to_char(a.branch_no),12) || rpad(a.city,15) || rpad(to_char(cnt1),20) );
+    	end loop;
+end;
+
+---SOLUTION
+
+
+Procedure COUNT_EMPLOYEE_PROC compiled
+
+
+PL/SQL procedure successfully completed.
+
+BRANCH NO.  CITY           # OF EMPLOYEE       
+-------------------------------------------------
+100         MANKATO        14                  
+101         SAINT PAUL     11                  
+102         ROCHESTER      7                   
+103         SPRINGFIELD    5                   
+104         WASHINGTON     4                   
+105         DOVER          2                   
+106         TALLAHASSEE    3                   
+107         HONOLULU       2                   
+108         JUNEAU         2                   
+109         SACRAMENTO     9                   
+110         CARSON CITY    8                   
+111         SALEM          5                   
+112         PHOENIX        6                   
+113         DENVER         7                   
+114         BOISE          5                   
+
+
+Oracle Example 10: Find no. of orders placed by each customer along with their first and last name (OES2)
+
+
+create or replace procedure find_no_orders(custno in number , no_of_orders out number) is
+cursor a is select count(order_no)cnt from oes2.orders where customer_no=custno ;
+cur_var a%rowtype ;
+begin
+  open a ; 
+  fetch a into cur_var ; 
+  no_of_orders := cur_var.cnt ;
+  close a ; 
+end;
+/
+
+declare
+  cnt number ;
+begin
+   dbms_output.put_line(rpad('Customer_No',15) || rpad('First Name',15) || rpad('Last Name',15) ||  rpad('No. Of Orders',15) );
+   dbms_output.put_line('----------------------------------------------------------');
+   for a in (select customer_no, fname, lname from oes2.customer)
+   loop
+        find_no_orders(a.customer_no ,cnt) ;
+        dbms_output.put_line(rpad(a.customer_no,15) || rpad(a.fname,15) || rpad(a.lname,15) || rpad(to_char(cnt),15)) ; 
+   end loop ;  
+end;
+
+
+
+--SOLUTION
+
+Procedure FIND_NO_ORDERS compiled
+
+
+PL/SQL procedure successfully completed.
+
+Customer_No    First Name     Last Name      No. Of Orders  
+----------------------------------------------------------
+1000           Roerig         Jake           18             
+1023           Jensen         Maria          20             
+1060           Al             Doering        17             
+1064           Donn           Jenkins        17             
+1068           Edward         Halle          17             
+1072           Michael        Bond           17             
+1076           Catherine      Thomas         19             
+1001           Steve          Case           16             
+1024           Muhammad       Aslam          14             
+1061           Steven         Widdes         13             
+1065           Earl M.        Colson         11             
+1069           Charles        Wehland        11             
+1073           Edward         Nabb           16             
+1077           William        Miller         12     
+
+
+
+
+													/*Stored Procedures - MSSQL Examples With Solutions*/
+													
+
+MSSQL Example 1: Hello from Stored Procedure
+
+Create or Alter procedure TSQL_firstproc  as
+begin
+	print('*************************************');
+	print('************** Hello*****************');
+end;
+go
+execute TSQL_firstproc;
+
+--SOLUTION
+
+*************************************
+************** Hello*****************
+
+Completion time: 2022-10-06T20:17:30.5157794-05:00
+
+
+MSSQL Example 2: Extended version of Hello from Stored Procedure
+
+Create procedure TSQL_SecondProc as
+begin
+	print('*************************************');
+	print('*******  Named Procedure ************');
+	print('**** Today date is ' + CAST(LEFT(GETDATE(),11) as 			varchar(20)) + ' ***');
+print('*************************************');
+end;
+go
+execute TSQL_SecondProc;
+drop procedure TSQL_SecondProc;
+
+--SOLUTION
+
+*************************************
+*******  Named Procedure ************
+**** Today date is Oct  6 2022 ***
+*************************************
+
+Completion time: 2022-10-06T20:21:25.6947422-05:00
+
+
+MSSQL Example 3: procedure lists the staffs of a specific branch(0ES2)
+
+CREATE PROCEDURE List_emp (@city1 VARCHAR(20)) AS
+BEGIN
+	--SET NOCOUNT ON;
+	DECLARE @LNAME VARCHAR(20), @FNAME VARCHAR(20), @DOB DATE;
+	DECLARE a CURSOR FOR 
+		SELECT e.lname, e.fname, e.dob 
+		FROM employee e 
+		WHERE upper(e.city)=upper(@city1);
+	OPEN a;
+	FETCH NEXT FROM a INTO @LNAME, @FNAME, @DOB
+	WHILE @@FETCH_STATUS=0 -- while a%found
+	BEGIN
+		PRINT 'Name= '+ISNULL(@LNAME, ' ')+' '+ISNULL(@FNAME, ' ‘);
+		PRINT 'DOB= '+ISNULL(CAST(CONVERT(DATE, @DOB) AS VARCHAR),' ‘);
+		FETCH NEXT FROM a INTO @LNAME, @FNAME, @DOB;
+	END
+	CLOSE a;
+	DEALLOCATE a;
+END;
+GO
+
+
+--Solutions*/
+
+Commands completed successfully.
+
+Completion time: 2022-10-07T20:41:56.7053948-05:00
+
+
+MSSQL Example 4: Hello from Stored Procedure with OES4 schema (SP and Driver Program) (0ES2)
+
+Create Procedure list_position1 (@position1 varchar(30)) 
+AS
+Begin
+   SELECT e.lname
+   FROM employee e join employee_position ep on e.position =ep.position
+   WHERE ep.description=@position1
+   print(@position1)
+END
+
+GO
+Create Procedure Hello1
+AS
+Begin
+ Print 'Hello to you from stored procedure'
+End
+GO
+
+execute Hello1
+
+--SOLUTION
+
+Hello to you from stored procedure
+
+Completion time: 2022-10-07T20:46:13.4395572-05:00
+
+
+MSSQL Example 5: Two overload procedures with the same name (hello) but diff variables (0ES2)
+
+Create or Alter procedure Hello (@var1 varchar(10)) as
+BEGIN
+   Print @var1
+END;
+go
+EXECUTE Hello 'Mankato';
+
+--SOLUTION
+
+Mankato
+
+Completion time: 2022-10-07T20:48:24.7531767-05:00
+
+
+Create or Alter procedure Hello (@var1 varchar(10), @var2 varchar(10)) as
+BEGIN
+   Print @var1+' '+@var2
+END;
+go
+EXECUTE Hello 'Mankato', 'MN';
+
+
+
+--SOLUTION
+
+Mankato MN
+
+Completion time: 2022-10-07T20:48:47.0858281-05:00
+
+
+
+MSSQL Example 6: Sample of a conditional procedure to check records within Customer table(OES2)
+
+CREATE OR ALTER PROCEDURE ConditionalProc AS
+BEGIN
+   DECLARE @id int;
+   DECLARE @fname varchar(20);
+   BEGIN
+      SET @id = 1000
+      WHILE @id < (SELECT COUNT(CUSTOMER_NO) FROM CUSTOMER) + 1000
+      BEGIN
+         IF (SELECT FNAME FROM CUSTOMER WHERE @id = CUSTOMER_NO) LIKE 'K%'
+         BEGIN
+            SET @fname = (SELECT FNAME FROM CUSTOMER WHERE @id =CUSTOMER_NO)
+            PRINT 'The person named '+@fname+' is cool.'
+         END
+         ELSE IF (SELECT FNAME FROM CUSTOMER WHERE @id = CUSTOMER_NO) LIKE 'STEVE%'
+         BEGIN
+            SET @fname = (SELECT FNAME FROM CUSTOMER WHERE @id =CUSTOMER_NO)
+            PRINT 'The person named '+@fname+' is a nerd.'
+         END
+        ELSE
+        BEGIN
+           PRINT 'Nothing interesting was found.'
+        END
+        SET @id += 1;
+     END
+   END
+END
+
+Execute ConditionalProc
+
+
+--SOLUTION
+
+Nothing interesting was found.
+The person named Steve is a nerd.
+Nothing interesting was found.
+The person named Kashif is cool.
+Nothing interesting was found.
+Nothing interesting was found.
+Nothing interesting was found.
+
+												
+												
+											Develop a similar example using a different database
+
+												/*User Defined Functions*/
+											
+											
+UDFs Example with solutions
+Oracle Example 1: Creating a UDF (hello …) and executing by driver program(0ES2)
+
+--Create a function in an anonymous block
+create or replace function Hello
+  return varchar
+  is
+  begin
+     return 'Hello from Function';
+  end;
+/
+
+declare
+   a      varchar(30);
+begin
+   a := Hello;
+   dbms_output.put_line (a);
+end;
+/
+drop function Hello;
+
+
+--SOLUTION		
+
+Function HELLO compiled
+
+
+PL/SQL procedure successfully completed.
+
+Hello from Function
+
+
+Function HELLO dropped.
+
+
+	
+Oracle Example 2: Creating a UDF (hello …) and executing by a SQL program(0ES2)
+
+SET SERVEROUTPUT ON
+
+
+create or replace function Hello
+  return varchar
+  is
+  begin
+     return 'Hello from Function';
+  end;
+/
+
+declare
+   a      varchar(30);
+begin
+   a := Hello;
+   dbms_output.put_line (a);
+end;
+/
+
+select hello() from staff;
+
+drop function Hello;
+
+
+
+--Solutions*/
+
+Function HELLO compiled
+
+
+PL/SQL procedure successfully completed.
+
+Hello from Function
+
+
+Oracle Example 3: Create a UDF to calculate AGE of employees running it with SQL porgram(0ES2)
+
+create or replace function age (dob in date)
+  return number is
+  age   number;
+begin
+  age := trunc(months_between(sysdate, dob)/12, 0);
+  return age;
+end;
+/
+
+select lname, age(dob) as AGE
+from employee;
+
+
+--Solutions*/
+
+
+Function AGE compiled
+
+
+LNAME               AGE
+------------ ----------
+Wyatt                68
+Wright               67
+Worral               67
+Wooton               66
+Widdes               66
+Wehland              65
+
+
+Oracle Example 4: Create UDF to calculate months between today date and employee DOB
+
+create or replace function Hello
+  return varchar2 is
+  begin
+     return 'Hello from Function';
+  end;
+/
+
+create or replace function months (dob in date)
+  return number is
+  months   number;
+begin
+  months := trunc(months_between(sysdate, dob), 0);
+  return months;
+end;
+/
+Col lname for 15
+Col fname for 15
+Col month_between heading 'Month|between 'for 9999
+col employee_no heading 'employee|no 'for a11
+col function for a20
+
+select employee_no, lname, sysdate Cur_Date, months(dob) as Month_Between, dob, Hello as function
+from oes2.employee
+where rownum <10;
+
+drop function hello;
+drop function months;
+
+
+------Solutions*/
+
+Function HELLO compiled
+
+
+Function MONTHS compiled
+
+SP2-0246: Illegal FORMAT string "15"
+SP2-0246: Illegal FORMAT string "15"
+
+   employee                                Month                              
+         no LNAME        CUR_DATE        between DOB       FUNCTION           
+----------- ------------ --------- ------------- --------- --------------------
+       1000 Wyatt        07-OCT-22           820 12-MAY-54 Hello from Function 
+       1001 Wright       07-OCT-22           814 10-NOV-54 Hello from Function 
+       1002 Worral       07-OCT-22           808 12-MAY-55 Hello from Function 
+       1003 Wooton       07-OCT-22           802 10-NOV-55 Hello from Function 
+       1004 Widdes       07-OCT-22           796 11-MAY-56 Hello from Function 
+       1005 Wehland      07-OCT-22           790 09-NOV-56 Hello from Function 
+       1006 Thomas       07-OCT-22           784 11-MAY-57 Hello from Function 
+       1007 Thomas       07-OCT-22           778 09-NOV-57 Hello from Function 
+       1008 Stone        07-OCT-22           772 11-MAY-58 Hello from Function 
+
+ 9 rows selected 
+
+
+Function HELLO dropped.
+
+Function MONTHS dropped.
+
+
+
+Oracle Example 5: list alll branches and number of staff in the branch(PROP)
+
+create or replace function count_staff
+     (branch in varchar2)
+      return number is
+     cursor a is select  count(staffno) tot from prop.staff
+		where branchno=branch;
+   a_var       a%rowtype;
+   begin
+     open a;
+     fetch a into a_var;
+     if a%notfound then
+         return 'No such Branch';
+     else
+         return a_var.tot;
+     end if;
+   end;
+/
+
+select  branchno, city, count_staff(branchno) "# of Staff "
+from prop.branch
+order by 3 desc;
+
+
+--Solutions*/
+
+Function COUNT_STAFF compiled
+
+
+BRANC CITY                                             # of Staff
+----- -------------------- ---------------------------------------
+B003  Glasgow                                                    3
+B007  Aberdeen                                                   3
+B002  London                                                     0
+B004  Bristol                                                    0
+B005  London                                                     0
+
+
+Oracle Example 6: List every customer and their total number of orders(OES2)
+	  Example 6a: do example 6 using Stored Procedure 
+	  
+CREATE OR REPLACE PROCEDURE GET_NUM_ORDERS   (CUST_NO IN OES2.CUSTOMER.CUSTOMER_NO%TYPE, TOTAL_ORDERS OUT NUMBER) IS
+  CURSOR CURS IS SELECT COUNT(*)
+	FROM OES2.ORDERS 
+	WHERE CUSTOMER_NO = CUST_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_ORDERS;
+  CLOSE CURS;
+END GET_NUM_ORDERS;
+/
+
+DECLARE
+TOTAL_ORDERS NUMBER;
+BEGIN
+  FOR A IN (SELECT CUSTOMER.CUSTOMER_NO, FNAME, LNAME FROM OES2.CUSTOMER)
+  LOOP
+    GET_NUM_ORDERS(A.CUSTOMER_NO, 	TOTAL_ORDERS);
+    DBMS_OUTPUT.PUT_LINE(A.CUSTOMER_NO || '  ' || A.FNAME || ' ' || A.LNAME || '   ' || TOTAL_ORDERS);
+  END LOOP;
+END;
+
+
+---Solutions*/
+
+Procedure GET_NUM_ORDERS compiled
+
+
+PL/SQL procedure successfully completed.
+
+1000  Roerig Jake   18
+1023  Jensen Maria   20
+1060  Al Doering   17
+1064  Donn Jenkins   17
+1068  Edward Halle   17
+1072  Michael Bond   17
+
+
+	  Example 6b: do example 6 using User Defined Functions(OES2)
+	  
+set serveroutput on;
+
+create or replace function count_orders
+     (customer1 in varchar2)
+      return number is
+    cursor a is 
+	select  count(order_no) tot
+	from oes2.orders
+	where customer_no=customer1;
+   a_var       a%rowtype;
+   begin
+     open a;
+     fetch a into a_var;
+     if a%notfound then
+         return 'No orders';
+     else
+         return a_var.tot;
+     end if;
+   end;
+/
+
+col no_orders heading "No|Orders" for 9999
+select customer_no
+      , fname
+      , lname
+      , count_orders(customer_no) No_Orders
+from oes2.customer;
+
+
+---Solutions*/
+
+Function COUNT_ORDERS compiled
+
+
+                                                                         No
+                            CUSTOMER_NO FNAME        LNAME           Orders
+--------------------------------------- ------------ ------------ ---------
+                                   1000 Roerig       Jake                18
+                                   1023 Jensen       Maria               20
+                                   1060 Al           Doering             17
+                                   1064 Donn         Jenkins             17
+                                   1068 Edward       Halle               17
+                                   1072 Michael      Bond                17
+                                   1076 Catherine    Thomas              19
+                                   1001 Steve        Case                16
+                                   1024 Muhammad     Aslam               14
+                                   1061 Steven       Widdes              13
+
+
+
+
+										MSSQL
+
+
+MSSQL Example 1: Creating a UDF (hello …) and executing by driver program(OES2)
+
+create or ALTER function Hello()
+  returns varchar(4000) as
+  begin
+     return 'Hello from Function';
+  end;
+GO
+
+declare @var varchar(400)
+set @var=dbo.hello()
+print @var
+
+drop function Hello;
+
+
+--Solutions*/
+
+Hello from Function
+
+Completion time: 2022-10-07T17:54:51.9704516-05:00
+
+
+MSSQL Example 2: Creating a UDF (hello …) and executing by a SQL program (OES2)
+
+create or ALTER function Hello()
+  returns varchar(4000) as
+  begin
+     return 'Hello from Function';
+  end;
+GO
+
+declare @var varchar(400)
+set @var=dbo.hello()
+print @var
+
+OR
+select dbo.hello() from staff
+drop function Hello;
+
+
+
+--Solutions*/
+
+Hello from Function
+
+Completion time: 2022-10-07T18:04:18.4526594-05:00
+
+
+
+
+MSSQL Example 3: Create a UDF to calculate AGE of employees running it with SQL 			program (OES2)
+
+create function age (@dob date)
+  returns numeric as
+ begin
+  	declare @age   float;
+ 
+  	set @age = DateDiff(year,@dob, GETDATE());
+  	return @age;
+end;
+GO
+
+select lname, dbo.age(dob) as AGE, dob
+from employee;
+
+
+--SOLUTION
+
+Wyatt	68	 12-May-54 
+Wright	68	 10-Nov-54 
+Worral	67	 12-May-55 
+Wooton	67	 10-Nov-55 
+Widdes	66	 11-May-56 
+Wehland	66	 9-Nov-56 
+
+MSSQL Example 4: Create UDF to calculate months between today date and 
+		employee DOB (OES4)
+		
+create function Hello()
+  returns varchar(4000) as
+  begin
+     return 'Hello from Function';
+  end;
+GO
+
+drop function Hello;
+create function months (@dob datetime)
+  returns float as
+ begin
+  declare @months   float;
+ 
+  set @months = DateDiff(Month, @dob, getdate());
+  return @months;
+end;
+GO
+
+drop function months;
+
+select top(9) employee_no, lname, getdate() "Cur Date", dbo.months(dob) as "Month Between", dob, dbo.Hello() as [function]
+from employee;
+
+
+--Solutions*/
+
+
+1000	Wyatt	2022-10-07 21:19:22.827	5	1954-05-12	Hello from Function
+1001	Wright	2022-10-07 21:19:22.827	11	1954-11-10	Hello from Function
+1002	Worral	2022-10-07 21:19:22.827	5	1955-05-12	Hello from Function
+1003	Wooton	2022-10-07 21:19:22.827	11	1955-11-10	Hello from Function
+1004	Widdes	2022-10-07 21:19:22.827	5	1956-05-11	Hello from Function
+1005	Wehland	2022-10-07 21:19:22.827	11	1956-11-09	Hello from Function
+
+
+
+
+MSSQL Example 5: list all branches and number of staff in the branch(PROP)
+
+
+create function count_staff(@branch varchar(4000))
+      returns varchar as
+ begin
+    declare a cursor local for select count(staffno)
+		from staff
+		where branchno=@branch;
+   declare @a_var_tot varchar(4000)
+     open a;
+     fetch a into @a_var_tot;
+     if @@fetch_status = 0 
+	 begin
+         return @a_var_tot;
+     end
+     else begin
+         return '0';
+     end 
+     return null;
+   end;
+GO
+
+drop function count_staff;
+
+select  branchno, city, dbo.count_staff(branchno) "# of Staff "
+from branch
+order by 3 desc;
+
+
+--Solutions*/
+
+B003	Glasgow		3
+B007	Aberdeen	3
+B002	London		0
+B004	Bristol		0
+B005	London		0

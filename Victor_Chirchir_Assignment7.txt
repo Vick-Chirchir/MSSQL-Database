@@ -1,0 +1,70 @@
+Individual Assignment #7
+Objective: Developing queries using Object Relational Databases (OOES)
+Answer the following queries by using OOES database. 
+
+Query 1: List employee number, last name, city, state, number of orders, and their total sales. 
+
+select e.employee_no NUM, e.employee.lname LNAME, a.city CITY, a.state STATE, sum(ol.qty) NUM_OF_ORDERS, sum(o.subtotal) TOTAL_SALES
+from o_employee e, TABLE(ADDRESS) a, orderline ol, orders o
+where e.employee_no = o.employee_no and o.order_no = ol.order_no
+group by e.employee_no, e.employee.lname, a.city, a.state;
+
+
+--SOLUTION
+
+NUM    LNAME    CITY         STATE  NUM_OF_ORDERS  TOTAL_SALES  
+1002   Wilson   Minneapolis  MN     1,183          358,380      
+1001   Johnson  Chicago      IL     2,670          619,870      
+1000   Wilson   Boston       BN     4,039          1,177,924
+
+
+Query 2: List employee number, last name, city, state, job description, and average number of orders, and their average sales. 
+
+
+SELECT e.EMPLOYEE_NO as EMPLOYEE_NO, e.EMPLOYEE.lname as LastName,
+a.city as City, a.state as State,  e.employee.position as Position, avg(o.order_no) Avg_No_Orders,cast(avg(o.subtotal)as decimal(10,2)) AvgTotal_Sales
+from O_employee e, Table(address) a,orders o
+group by e.EMPLOYEE_NO, e.EMPLOYEE.lname, a.city, a.state, e.employee.position;
+
+--SOLUTION
+
+EMPLOYEE_NO  LASTNAME  CITY         STATE  POSITION   AVG_NO_ORDERS  AVGTOTAL_SALES  
+1001         Johnson   Chicago      IL     Assistant  913.8125       81,358.44       
+1002         Wilson    Minneapolis  MN     Assistant  913.8125       81,358.44       
+1000         Wilson    Boston       BN     Sales Rep  913.8125       81,358.44 
+
+
+Query 3: List pair of customer numbers that they are from the same state, name, city, state, number of orders, their total purchases, total shipping charge, total taxes, and overall totals.
+
+
+SELECT C.CUSTOMER_NO,C.CUSTOMER.lname LNAME, a.city CITY, a.state STATE, sum(ol.qty) NUM_OF_ORDERS, sum(o.SUBTOTAL) total_purchases,
+sum(o.SHIPPING_CHARGE) total_shipping_charge,sum(o.TAX_AMT)total_taxes,sum(o.TOTAL_AMT) overall_totals
+FROM O_CUSTOMER C,TABLE(ADDRESS) a,orderline ol, orders o
+where a.state = 'MN' 
+group by C.CUSTOMER_NO, C.CUSTOMER.lname , a.city, a.state;
+
+
+--SOLUTION
+
+CUSTOMER_NO  LNAME  CITY     STATE  NUM_OF_ORDERS  TOTAL_PURCHASES  TOTAL_SHIPPING_CHARGE  TOTAL_TAXES  OVERALL_TOTALS  
+1059         Jake   Mankato  MN     134,304        33,845,110       2,074,904              1,338,558    37,258,598      
+1023         Maria  New Ulm  MN     134,304        33,845,110       2,074,904              1,338,558    37,258,598      
+1003         Aslam  Mankato  MN     134,304        33,845,110       2,074,904              1,338,558    37,258,598      
+1000         Case   New Ulm  MN     134,304        33,845,110       2,074,904              1,338,558    37,258,598    
+
+ 
+Query 4: List branch number, city, state, number products sold, and their total sales
+
+
+SELECT e.branch_NO as branch_NO,b.city as City, B.STATE as State,sum(ol.qty) Num_Prod,sum(o.subtotal) Total_Sales
+from O_employee e, branch b,orders o,orderline ol
+where B.BRANCH_NO=E.BRANCH_NO and E.EMPLOYEE_NO=O.EMPLOYEE_NO and O.ORDER_NO=OL.ORDER_NO
+group by E.BRANCH_NO,B.CITY,B.STATE;
+
+
+--SOLUTION
+
+BRANCH_NO  CITY     STATE  NUM_ROD  TOTAL_SALES  
+7040       Chicago  IL     1,183     358,380      
+101        Manakto  MN     4,039     1,177,924    
+100        Chicago  IL     2,670     619,870  

@@ -1,0 +1,1454 @@
+             							PLSQL – First program
+
+Set serveroutput on
+BEGIN
+	DBMS_OUTPUT.PUT_LINE(' ***** Hello World *****');
+  DBMS_OUTPUT.PUT_LINE(' ***** My Name is Azarbd*****');
+END;
+/
+
+										Result of the query: 
+
+PL/SQL procedure successfully completed.
+
+ ***** Hello World *****
+ ***** My Name is Azarbd*****
+
+
+									T-SQL – First program SQL Server
+
+BEGIN
+	print(' ***** Hello World *****');
+END
+Go
+
+										Result of the query: 
+
+ ***** Hello World *****
+
+Completion time: 2022-09-28T13:05:56.6445865-05:00
+
+
+
+								PL/SQL Program: Typical code block
+set serveroutput on;
+declare
+    var1	number(3);
+begin
+    select 'Number of Employee' || count(*)
+      into var1
+    from employee;
+    dbms_output.put_line (var1);
+exception
+   when others then dbms_output.put_line('ERROR OCCURRED');
+end;
+/
+
+								Result of the query: 
+
+PL/SQL procedure successfully completed.
+
+ERROR OCCURRED
+
+							T-SQL Program: Typical code block  
+declare @var1	numeric;
+begin try
+    select @var1 = 'Number of Employee' + count(*)
+    from employee;
+    print  @var1;
+end try
+begin catch
+   print ('ERROR OCCURRED');
+end catch
+Go
+
+								Result of the query: 
+
+
+ERROR OCCURRED
+
+Completion time: 2022-09-28T13:20:16.9007562-05:00
+
+
+
+							PL/SQL Program: Typical code block
+SET SERVEROUTPUT ON;
+declare
+	var1	varchar(24);
+begin
+	select 'Number of Employees: ' || count(*)
+	into var1
+	from oes2.employee;
+	dbms_output.put_line (var1);
+exception
+	when others then dbms_output.put_line('ERROR OCCURRED');
+end;
+
+								Result of the query: 
+
+PL/SQL procedure successfully completed.
+
+Number of Employees: 90
+
+							T-SQL Program: Typical code block
+declare @var1	int
+begin try
+	select @var1 = 'Number of Employees: ' + convert(varchar, count(*))
+	from employee;
+	print  @var1;
+end try
+begin catch
+   print ('ERROR OCCURRED');
+end catch
+Go
+
+								Result of the query: 
+
+ERROR OCCURRED
+
+Completion time: 2022-09-28T13:24:37.3738904-05:00
+
+
+							T-SQL Program: Typical code block
+declare @var1	varchar(24);
+begin try
+	select @var1 = 'Number of Employees: ' + convert(varchar, count(*))
+	from employee;
+	print  @var1;
+end try
+begin catch
+   print ('ERROR OCCURRED');
+end catch
+Go
+
+									Result of the query: 
+
+Number of Employees: 90
+
+Completion time: 2022-09-28T13:27:51.3279817-05:00
+
+
+						Assigning Values to variables - Example
+
+						1. Query: select the retirement of the oldest employee
+
+set serveroutput on;
+DECLARE
+	retirement_date  date;
+	emp_var  employee%rowtype;
+BEGIN
+	SELECT min(DOB)
+	INTO emp_var.DOB
+	FROM employee;
+	retirement_date := add_months(emp_var.DOB, 12*65);
+	dbms_output.put_line ('Retirement date is '
+	|| to_char(retirement_date, 'dd/mm/yyyy'));
+END;
+
+PL/SQL procedure successfully completed.
+
+Retirement date is 12/05/2019
+
+						2. Retirement date for the youngest employee
+
+DECLARE
+	@retirement_date date,
+	@emp_var date;
+BEGIN
+	SELECT @emp_var = min(EMPLOYEE.DOB)
+	FROM EMPLOYEE;
+	SET @retirement_date = dateadd(month, 12*65, @emp_var);
+	print('Retirement date is ' + convert(varchar, @retirement_date, 101));
+END;
+
+								Result of the query: 
+
+
+Retirement date is 05/10/2025
+
+Completion time: 2022-09-28T14:23:37.1422433-05:00
+
+					PL/SQL: IF-THEN-ELSE and ELSIF Structures - Example
+
+
+set serveroutput on; 
+DECLARE
+    male_avg       number;
+    female_avg     number;
+BEGIN
+    SELECT avg(months_between(sysdate, dob)/12) INTO male_avg 
+    FROM prop.staff where sex = 'M';
+    SELECT avg(months_between(sysdate, dob)/12) INTO female_avg 
+    FROM.staff where sex = 'F';   
+if (male_avg >prop female_avg) 
+ then
+      dbms_output.put_line ('Males have the greatest avg hiring age');
+    	dbms_output.put_line ('With and avg age of '||to_char(round(male_avg)));
+  else
+     	dbms_output.put_line ('Females have the greatest avg hiring age');
+     	dbms_output.put_line ('With and avg age of '||to_char(round(female_avg)));
+end if;
+END;
+
+
+									Result of the query: 
+
+NOTE: GOT A DIFFERENT VALUE FROM THE ONE IN THE NOTES
+
+PL/SQL procedure successfully completed.
+
+Females have the greatest avg hiring age
+With and avg age of 39
+
+
+
+
+							TSQL: IF-THEN-ELSE and ELSIF Structures - Example
+	
+declare @intMaleAvg int
+declare @intFemaleAvg int
+Begin
+	Select @intMaleAvg = avg(DATEDIFF(Year,dob,GETDATE()))
+	from staff
+	where sex = 'M'
+	Select @intFemaleAvg = avg(DATEDIFF(Year,dob,GETDATE()))
+	from staff
+	where sex = 'F'
+ 
+	if (@intMaleAvg > @intFemaleAvg) 
+	Begin
+		print 'Males have the greatest average hiring age'
+		print 'With and average age of ' + Cast(@intMaleAvg as Varchar(10))
+	End
+	Else
+	Begin
+		Print 'Females have the greatest average hiring age'
+		Print 'With and average age of ' + Cast(@intFemaleAvg as Varchar(10))
+	End
+End
+
+									Result of the query: 
+
+NOTE: GOT A DIFFERENT VALUE FROM THE ONE IN THE NOTES
+
+Males have the greatest average hiring age
+With and average age of 49
+
+Completion time: 2022-09-28T18:26:31.7440568-05:00
+
+Note: Used staff table on Prop2 database on SQL Server since we did not have Employee on Prop2 database.
+
+								PL/SQL: Nested IF-THEN-ELSE Structures Example
+
+
+set serveroutput on
+declare
+    	male_avg       number;
+    	female_avg     number;
+begin
+	select avg(months_between(sysdate, dob)/12) into male_avg 
+	from employee where gender = 'M';
+	select avg(months_between(sysdate, dob)/12) into female_avg 
+	from employee where gender = 'F';
+	if (male_avg > female_avg) then
+		dbms_output.put_line ('Males have the greatest avg hiring age');
+		dbms_output.put_line ('With an avg age of '||to_char(round(male_avg)	));
+		if (male_avg > female_avg + 10) then
+			dbms_output.put_line ('The male average is greater than 10 years');
+		end if;
+	else
+		dbms_output.put_line ('Females have the greatest avg hiring age');
+		dbms_output.put_line ('With and avg age of '||to_char(round(female_avg)));
+	end if;
+end;
+
+
+									Result of the query: 
+
+
+PL/SQL procedure successfully completed.
+
+Males have the greatest avg hiring age
+With an avg age of 48
+
+
+
+						TSQL: Nested IF-THEN-ELSE Structures Example
+
+declare @intMaleAvg int
+declare @intFemaleAvg int
+Begin
+	Select @intMaleAvg = avg(DATEDIFF(Year,dob,GETDATE()))
+	from staff
+	where sex= 'M'
+	Select @intFemaleAvg = avg(DATEDIFF(Year,dob,GETDATE()))
+	from staff
+	where sex= 'F'
+	
+	if (@intMaleAvg > @intFemaleAvg) 
+	Begin
+		print 'Males have the greatest average hiring age'
+		print 'With and average age of ' + Cast(@intMaleAvg as Varchar(10))
+		If (@intMaleAvg > @intFemaleAvg+1)
+		Begin
+			Print 'Male average is greater by 1 year'
+		End
+	End
+	Else
+	Begin
+		Print 'Females have the greatest average hiring age'
+		Print 'With and average age of ' + Cast(@intFemaleAvg as Varchar(10))
+		If (@intFemaleAvg > @intMaleAvg+1)
+		Begin
+			Print 'Female average is greater by 1 year'
+		End
+	End
+End
+
+									Result of the query: 
+
+
+NOTE: GOT A DIFFERENT VALUE. CHANGED THE TABLE SINCE MY EMPLOYEE TABLE DID NOT HAVE GENDER. 
+
+Males have the greatest average hiring age
+With and average age of 49
+Male average is greater by 1 year
+
+Completion time: 2022-09-28T19:02:09.9308435-05:00
+
+
+
+							TSQL: Demonstrates the GOTO Command (Example)
+Declare @vchTop varchar(50)
+Declare @vchMiddle varchar(50)
+Declare @vchBottom varchar(50)
+begin
+	Select @vchTop = 'This is the top label'
+	Select @vchMiddle = 'This is the middle label'
+	Select @vchBottom = 'This is the bottom label'
+	goto BOTTOMLABEL	
+	TOPLABEL:
+	Begin
+		print @vchTop
+		goto MIDDLELABEL
+	End	
+	BOTTOMLABEL:
+	Begin
+		print @vchBottom
+		goto TOPLABEL		
+	End
+	MIDDLELABEL:
+	Begin
+		print @vchMiddle
+	End
+End
+
+
+ 										Result of the query: 
+
+This is the bottom label
+This is the top label
+This is the middle label
+
+Completion time: 2022-09-28T19:07:26.3529402-05:00
+
+
+							PL/SQL: The ELSIF/THEN Structure - Example
+set serveroutput on;
+declare
+    current_month       char(3);
+  begin
+    select to_char(sysdate, 'MON') into current_month from dual;
+    if current_month = 'JAN' then
+      dbms_output.put_line ('My daughter Jane was born in Jan');
+    elsif current_month = 'FEB' then
+      dbms_output.put_line ('My good friend Ron was born in Feb');
+    elsif current_month = 'MAR' then
+      dbms_output.put_line ('My father was born in March');
+    elsif current_month = 'APR' then
+      dbms_output.put_line ('I was born in April');
+    elsif current_month = 'MAY' then
+      dbms_output.put_line ('My son Matt was born in May');
+    elsif current_month = 'OCT' then
+      dbms_output.put_line ('My wife was born in October');
+    else
+      dbms_output.put_line ('I do not have any relatives 
+                             born in '||current_month);
+    end if;
+end;
+
+
+									Result of the query: 
+
+
+I do not have any relatives 
+                             born in SEP
+
+NOTE: VARIED ANSWER DUE TO SYSDATE
+
+
+								PL/SQL: Cursors - Example
+
+set serveroutput on;
+DECLARE
+	oldest_birth_date     date;
+	lname                 employee.lname%type;
+	fname                 employee.fname%type;
+	cursor find_old_b_day is select min(dob) from employee;
+	cursor id_emp is select lname, fname from employee where dob = oldest_birth_date;
+BEGIN
+	open find_old_b_day;
+	fetch find_old_b_day into oldest_birth_date;
+	close find_old_b_day;
+	open id_emp;
+	fetch id_emp into lname, fname;
+	close id_emp;
+	dbms_output.put_line ('The Oldest employee Is ' || fname || ' ' || lname);
+END;
+
+
+									Result of the query:
+PL/SQL procedure successfully completed.
+
+The Oldest employee Is Stefan Wyatt
+
+								Oracle & SQL Server Comparison
+
+declare @intMaleAvg int
+declare @intFemaleAvg int
+Begin
+	Select @intMaleAvg = avg(DATEDIFF(Year,dob,GETDATE()))
+	from staff
+	where sex = 'M'
+	Select @intFemaleAvg = avg(DATEDIFF(Year,dob,GETDATE()))
+	from staff
+	where sex = 'F'
+	
+	
+	if (@intMaleAvg > @intFemaleAvg) 
+	Begin
+		print 'Males have the greatest average hiring age'
+		print 'With and average age of ' + Cast(@intMaleAvg as Varchar(10))
+	End
+	Else
+	Begin
+		Print 'Females have the greatest average hiring age'
+		Print 'With and average age of ' + Cast(@intFemaleAvg as Varchar(10))
+	End
+End
+
+
+									Result of the query:
+Males have the greatest average hiring age
+With and average age of 49
+
+Completion time: 2022-09-30T19:57:00.1839132-05:00
+
+
+
+
+								PLSQL Part 1-Section 1: Practice 1.1.1
+
+										1. Print two lines:
+									your last name, First name
+									Today date
+
+Set serveroutput on
+BEGIN
+	DBMS_OUTPUT.PUT_LINE(' Chirchir, Victor');
+  DBMS_OUTPUT.PUT_LINE(' Todays Date is '|| sysdate);
+END;
+
+
+PL/SQL procedure successfully completed.
+
+ Chirchir, Victor
+ Todays Date is 30-SEP-22
+
+								2. Find a retirement date for the youngest employee
+set serveroutput on;
+DECLARE
+	retirement_date  date;
+	emp_var  employee%rowtype;
+BEGIN
+	SELECT min(DOB)
+	INTO emp_var.DOB
+	FROM employee;
+	retirement_date := add_months(emp_var.DOB, 12*65);
+	dbms_output.put_line ('Retirement date is '
+	|| to_char(retirement_date, 'dd/mm/yyyy'));
+END;
+
+                  								Result of the query:
+PL/SQL procedure successfully completed.
+
+Retirement date is 12/05/2019
+
+
+										3. Find a retirement date for the oldest employee
+
+set serveroutput on;
+DECLARE
+	retirement_date  date;
+	emp_var  employee%rowtype;
+BEGIN
+	SELECT max(DOB)
+	INTO emp_var.DOB
+	FROM employee;
+	retirement_date := add_months(emp_var.DOB, 12*65);
+	dbms_output.put_line ('Retirement date is '
+	|| to_char(retirement_date, 'dd/mm/yyyy'));
+END;
+
+												Result of the query:
+
+PL/SQL procedure successfully completed.
+
+Retirement date is 28/04/2104
+
+
+										4. Find overall total sales (subtotal)
+
+set serveroutput on;
+DECLARE
+   total_sales  number;
+    cursor find_sales_total is select sum(SUBTOTAL) from orders;
+BEGIN
+    open find_sales_total;
+    fetch find_sales_total into total_sales;
+    close  find_sales_total;
+    dbms_output.put_line ('The overall total sales are $'|| total_sales);
+END;
+
+
+PL/SQL procedure successfully completed.
+
+The overall total sales are $2719735
+
+
+
+											5. Find overall total tax
+
+DECLARE
+	total_tax  number;
+	cursor Find_TotalTax is select sum(TAX_AMT) from orders;
+BEGIN
+	open Find_TotalTax;
+	fetch Find_TotalTax into total_tax;
+	close  Find_TotalTax;
+	dbms_output.put_line ('The overall total tax are $'|| total_tax);
+END;
+
+
+
+PL/SQL procedure successfully completed.
+
+The overall total tax are $8960052.94038366
+
+
+										6. Find overall total shipment charges
+
+DECLARE
+	Total_Shipment_Charges  number;
+	cursor shippingCharge is select sum(shipping_charge) from orders;
+BEGIN
+	open shippingCharge ;
+	fetch shippingCharge  into Total_Shipment_Charges;
+	close  shippingCharge ;
+	dbms_output.put_line ('The overall total shipment charges are $'|| Total_Shipment_Charges);
+END;
+
+
+PL/SQL procedure successfully completed.
+
+The overall total shipment charges are $7176881
+
+
+
+										PLSQL Part 1-Section 1: Practice 1.1.2
+
+1. Print two lines:
+your last name, First name, your course with section (Adams, John  CIS 440-02)
+Today date is xx-xxx-2022
+
+Set serveroutput on
+BEGIN
+	DBMS_OUTPUT.PUT_LINE(' Chirchir, Victor, CIS 540-1');
+  DBMS_OUTPUT.PUT_LINE(' Today Date is '|| sysdate);
+END;
+
+PL/SQL procedure successfully completed.
+
+ Chirchir, Victor, CIS 540-1
+ Today Date is 30-SEP-22
+
+
+
+2. Find a retirement date for the oldest employee
+
+set serveroutput on;
+DECLARE
+	retirement_date  date;
+	emp_var  employee%rowtype;
+BEGIN
+	SELECT max(DOB)
+	INTO emp_var.DOB
+	FROM employee;
+	retirement_date := add_months(emp_var.DOB, 12*65);
+	dbms_output.put_line ('Retirement date is '
+	|| to_char(retirement_date, 'dd/mm/yyyy'));
+END;
+
+
+PL/SQL procedure successfully completed.
+
+Retirement date is 28/04/2104
+
+Find the last name and retirement date for the oldest employee
+
+
+
+3. Find overall total purchase (total_Amt) for customer 1001
+
+DECLARE
+	total_purchase  number;
+	cursor a is select sum(total_amt) from orders where customer_no = 1001;
+BEGIN
+	open a;
+	fetch a into total_purchase;
+	close  a;
+	dbms_output.put_line ('Overall total tax for customer 1001 are $'|| total_purchase);
+END;
+/
+
+PL/SQL procedure successfully completed.
+
+Overall total tax for customer 1001 are $3101638.4722988
+
+
+4. Find overall total tax for customer 1001
+
+DECLARE
+	total_tax  number;
+	cursor a is select sum(TAX_AMT) from orders where customer_no = 1001;
+BEGIN
+	open a;
+	fetch a into total_tax;
+	close  a;
+	dbms_output.put_line ('Overall total tax for customer 1001 are $'|| total_tax);
+END;
+/
+
+PL/SQL procedure successfully completed.
+
+Overall total tax for customer 1001 are $134602.7222988
+
+
+5. Find overall total shipment charges for customer 1001 
+
+DECLARE
+	total_shipment_charges  number;
+	cursor a is select sum(shipping_charge) from orders
+  where customer_no = 1001;
+BEGIN
+	open a;
+	fetch a into total_shipment_charges;
+	close  a;
+	dbms_output.put_line ('The overall total shipment charges for customer 1001  are $'|| total_shipment_charges);
+END;
+/
+
+PL/SQL procedure successfully completed.
+
+The overall total shipment charges for customer 1001  are $43780.75
+
+
+
+											PLSQL Part 1-Section 1: Practice 1.1.3
+
+1. Print three lines:
+Line 1: your last name, First name
+Line 2: your course number and course name 
+Today date is DD/MMM/YYYY
+
+
+BEGIN
+	DBMS_OUTPUT.PUT_LINE(' Chirchir, Victor');
+  DBMS_OUTPUT.PUT_LINE(' CIS 540-01, Database Management Systems II');
+  DBMS_OUTPUT.PUT_LINE(' Today date is ' || sysdate);
+END;
+/ 
+
+Chirchir, Victor
+ CIS 540-01, Database Management Systems II
+ Today date is 30-SEP-22
+
+
+2. Find a retirement date for the oldest employee in branch 100
+
+
+DECLARE
+	retirement_date  date;
+	emp_var  employee%rowtype;
+BEGIN
+	SELECT MAX(DOB)
+	INTO emp_var.DOB
+	FROM employee WHERE branch_no = 100 ;
+	retirement_date := add_months(emp_var.DOB, 12*65);
+	dbms_output.put_line ('Retirement date is '
+	|| to_char(retirement_date, 'dd/mm/yyyy'));
+END;
+/
+
+PL/SQL procedure successfully completed.
+
+Retirement date is 30/04/2096 
+
+
+3. Find the last name and retirement date for the oldest employee in branch 100
+
+DECLARE
+	oldest_birth_date date;
+	lname employee.lname%type;
+  retirement_date  date;
+	emp_var  employee%rowtype;
+	cursor a is select max(dob) from employee where branch_no = 100;
+	cursor b is select lname from employee where dob = oldest_birth_date and branch_no = 100;
+BEGIN
+	open a;
+	fetch a into oldest_birth_date;
+	close a;
+	open b;
+	fetch b into lname;
+	close b;
+  SELECT MAX(DOB)
+	INTO emp_var.DOB
+	FROM employee;
+	retirement_date := add_months(emp_var.DOB, 12*65);
+	dbms_output.put_line ('The Oldest employee Is ' || lname||' and his retirement date is '
+	|| to_char(retirement_date, 'dd/mm/yyyy'));
+END;
+/
+
+PL/SQL procedure successfully completed.
+
+The Oldest employee Is Hanzdo and his retirement date is 28/04/2104
+
+
+
+
+
+4. Find overall total sales (subtotal) for employee 1002
+
+DECLARE
+	total_sales  number;
+	cursor a is select sum(SUBTOTAL) from orders where employee_no = 1002;
+BEGIN
+	open a;
+	fetch a into total_sales;
+	close  a;
+	dbms_output.put_line ('The total sales are $'|| total_sales);
+END;
+/
+
+
+PL/SQL procedure successfully completed.
+
+The total sales are $4160045
+
+
+5. Find overall total tax for employee 1005
+
+
+DECLARE
+	total_tax  number;
+	cursor a is select sum(TAX_AMT) from orders where employee_no = 1005;
+BEGIN
+	open a;
+	fetch a into total_tax;
+	close  a;
+	dbms_output.put_line ('The overall total tax for employee 1005 are $'|| total_tax);
+END;
+/
+
+PL/SQL procedure successfully completed.
+
+The overall total tax for employee 1005 are $114252.275459805
+
+
+
+6. Find overall total shipment charges for employee 1004
+
+
+DECLARE
+	total_shipment_charges  number;
+	cursor a is select sum(shipping_charge) from orders
+  where employee_no = 1004;
+BEGIN
+	open a;
+	fetch a into total_shipment_charges;
+	close  a;
+	dbms_output.put_line ('The overall total shipment charges for employee 1004 
+  are $'|| total_shipment_charges);
+END;
+/
+
+
+PL/SQL procedure successfully completed.
+
+The overall total shipment charges for employee 1004 
+  are $72210.25
+
+
+											Oracle & SQL Server Comparison
+											Forever-loop using counter
+
+set serveroutput on
+declare
+    counter_variable   number := 1;
+    cursor a is select lname, fname from staff;
+    cur_var            a%rowtype;
+begin
+    open a;
+    loop
+      exit when counter_variable = 7;
+      fetch a into cur_var;
+      dbms_output.put_line (cur_var.lname || ', '||cur_var.fname);
+      counter_variable := counter_variable +1;
+    end loop;
+end;
+/
+
+
+PL/SQL procedure successfully completed.
+
+White, John
+Beech, Ann
+Ford, David
+Howe, Mary
+Brand, Susan
+Lee, Julie
+
+
+										PL/SQL: The LOOP Structure – using WHEN to exit
+declare
+	counter_variable   number := 1;
+	cursor a is select lname, fname  from employee;
+	cur_var  a%rowtype;
+begin
+	open a;
+	loop
+		exit when counter_variable = 4;
+		fetch a into cur_var;
+		dbms_output.put_line (cur_var.lname || ', '||cur_var.fname);
+		counter_variable := counter_variable +1;
+	end loop;
+	close a;
+end;
+/
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt, Stefan
+Wright, Donald
+Worral, Al
+
+
+										PL/SQL: The WHILE LOOP Structure 
+
+declare
+	counter_variable   number := 1;
+	cursor a is select lname, fname from employee;
+	cur_var  a%rowtype;
+begin
+	open a;
+	while counter_variable != 4
+	loop
+		fetch a into cur_var;
+		dbms_output.put_line (cur_var.lname || ', '||cur_var.fname);
+		counter_variable := counter_variable +1;
+	end loop;
+close a; -- optional
+end;
+/
+
+
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt, Stefan
+Wright, Donald
+Worral, Al
+
+
+
+											TSQL: The WHILE LOOP Structure 
+
+DECLARE
+	@counter_variable int = 1, 
+	@cur_var1 varchar(50), 	@cur_var2 varchar(50);
+DECLARE a CURSOR FOR SELECT LNAME, FNAME FROM EMPLOYEE;
+BEGIN
+	OPEN a;
+	WHILE (@counter_variable < 4)
+	BEGIN
+		fetch a into @cur_var2, @cur_var1;
+		print(@cur_var2 + ', ' + @cur_var1);
+		SET @counter_variable = @counter_variable + 1;
+	END;
+	CLOSE a;
+END 
+
+
+
+Wyatt,  Stefan
+Wright, Donald
+Worral, Al
+
+Completion time: 2022-09-30T20:40:58.3959939-05:00
+
+
+
+											TSQL: while Loops
+
+Declare 
+ @intCounter int
+ Set @intCounter = 0
+Begin  
+  While (@intcounter <=7)
+  Begin
+       Print 'Loop # ' + CAST(@intCounter as varchar(2))
+       Set @intCounter = @intCounter + 1
+  End
+End
+
+
+
+Loop # 0
+Loop # 1
+Loop # 2
+Loop # 3
+Loop # 4
+Loop # 5
+Loop # 6
+Loop # 7
+
+Completion time: 2022-09-30T21:37:04.6576401-05:00
+
+
+
+									PL/SQL: while loop using %FOUND and  Cursor
+
+set serveroutput on
+declare
+    cursor a is select lname, fname from oes2.employee;
+    cur_var            a%rowtype;
+begin
+    open a;
+    fetch a into cur_var;
+    while a%found
+    loop
+      dbms_output.put_line (cur_var.lname|| ', '||cur_var.fname);
+      fetch a into cur_var;
+    end loop;
+	close a;
+
+end;
+/
+
+
+
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt,  Stefan
+Wright, Donald
+Worral, Al
+Wooton, Bruce
+Widdes, Albert
+Wehland, William C.
+Thomas, Peter
+Thomas, Patricia A.
+Stone, James F.
+Stewart, John C.
+Stansbury, Thomas
+Stansbury, Steward
+Somers, Bill
+Simmins, Steven
+Ripkin, Jan
+Reed, Donna
+Prouty, Neil
+Pregmon, Andrew
+Polott, Robert
+Parker, Donn
+Nilson, John
+Nelson, Steward
+Nabb, Claude
+Murthy, Richard
+Mudd, Earl M.
+Miller, Paul
+McMillan, Don
+McKissick, Doris
+Mayfield, John
+Martin, Edward
+Keting, Charles
+Katz, Sheela
+Johnston, Doug
+Johnson, James
+Jenkins, Dusky
+Holman, James
+Heisler, Harrison
+Harris, Macy
+Hanzdo, Robert S.
+Halle, Edward
+Geriach, David
+Forman, Lee
+Farmer, Michael
+Dupont, George
+Dunn, Michael
+Doering, Willard
+Doering, Thomas
+Constable, Ramond
+Colson, Eugenia
+Claggett, Edward
+Bullit, Stephan
+Bond, Jullian
+Worral,  Stefan
+Pregmon, Agnes
+Martin, Al
+Heisler, Albert
+Murthy, Andrew
+Colson, Bill
+Jenkins, Bruce
+Beckley, Catherine
+Bixler, Charles
+Harris, Claude
+Blazek-White, David
+Somers, Don
+Halle, Donald
+Parker, Donn
+Bond, Donna
+Adams, Doris
+Allen, Doug
+Alan, Dusky
+Nabb, Earl M.
+Claggett, Edward
+Doering, Edward
+Polott, Edward
+Dunn, Eugenia
+Reed, George
+Bullit, Harrison
+McMillan, Howard
+Wright, Hubert
+Wooton, James
+Stone, James
+Keting, James F.
+Prouty, Jan
+Forman, John
+Johnston, John
+Ripkin, John C.
+Holman, Judy
+Wyatt, Jullian
+Hanzdo, Lee
+Stewart, Macy
+
+									PL/SQL: %FOUND Cursor Attribute with Loops
+
+
+
+declare
+	cursor a is select lname, fname from employee;
+	cur_var            a%rowtype;
+begin
+	open a;
+	fetch a into cur_var;
+	while a%found 
+	loop
+		dbms_output.put_line (cur_var.lname|| ', '||cur_var.fname);
+		fetch a into cur_var;
+	end loop;
+end;
+/
+
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt,  Stefan
+Wright, Donald
+Worral, Al
+Wooton, Bruce
+Widdes, Albert
+Wehland, William C.
+Thomas, Peter
+Thomas, Patricia A.
+Stone, James F.
+Stewart, John C.
+
+
+
+									PL/SQL: Better formatting and reporting – 1a
+
+set serveroutput on 
+declare 
+    cursor a is select employee_no, lname, fname, dob from oes2.employee   	        where lower(city) = 'mankato'; 
+    cur_var            a%rowtype; 
+begin 
+dbms_output.put_line('EMP  Last             First      Date'); 
+dbms_output.put_line('NO   Name             Name       of Birth'); 
+dbms_output.put_line('---- ---------------  ---------- ---------');   
+open a; 
+    fetch a into cur_var; 
+    while a%found 
+    loop 
+      dbms_output.put_line (cur_var.employee_no|| ' '||rpad(cur_var.lname,15)|| ', '||rpad(cur_var.fname,10)|| ' '||cur_var.dob);
+
+      fetch a into cur_var; 
+    end loop;
+       close a; 
+end; 
+/ 
+
+
+
+PL/SQL procedure successfully completed.
+
+EMP  Last             First      Date
+NO   Name             Name       of Birth
+---- ---------------  ---------- ---------
+1000 Wyatt          ,  Stefan    12-MAY-54
+1001 Wright         , Donald     10-NOV-54
+1003 Wooton         , Bruce      10-NOV-55
+1004 Widdes         , Albert     11-MAY-56
+1005 Wehland        , William C. 09-NOV-56
+1007 Thomas         , Patricia A 09-NOV-57
+1008 Stone          , James F.   11-MAY-58
+1009 Stewart        , John C.    09-NOV-58
+1010 Stansbury      , Thomas     11-MAY-59
+1011 Stansbury      , Steward    12-JUN-59
+1014 Ripkin         , Jan        08-NOV-60
+1079 Wooton         , James      04-NOV-76
+1088 Hanzdo         , Lee        30-APR-31
+
+
+								PL/SQL: Better formatting and reporting - 1
+
+set serveroutput on 
+declare 
+cursor a is select employee_no, lname, fname, dob from oes2.employee where lower(city) = 'mankato'; 
+cur_var            a%rowtype; 
+begin 
+dbms_output.put_line('EMP  Last             First      Date'); 
+dbms_output.put_line('NO   Name             Name       of Birth'); 
+dbms_output.put_line('---- ---------------  ---------- ---------');   
+open a; 
+fetch a into cur_var; 
+while a%found 
+    loop 
+      dbms_output.put_line (cur_var.employee_no|| ' '||rpad(cur_var.lname,15)|| ', '||rpad(cur_var.fname,10)|| ' '||cur_var.dob);
+
+      fetch a into cur_var; 
+end loop; 
+end; 
+/ 
+
+
+
+
+PL/SQL procedure successfully completed.
+
+EMP  Last             First      Date
+NO   Name             Name       of Birth
+---- ---------------  ---------- ---------
+1000 Wyatt          ,  Stefan    12-MAY-54
+1001 Wright         , Donald     10-NOV-54
+1003 Wooton         , Bruce      10-NOV-55
+1004 Widdes         , Albert     11-MAY-56
+1005 Wehland        , William C. 09-NOV-56
+1007 Thomas         , Patricia A 09-NOV-57
+1008 Stone          , James F.   11-MAY-58
+1009 Stewart        , John C.    09-NOV-58
+1010 Stansbury      , Thomas     11-MAY-59
+1011 Stansbury      , Steward    12-JUN-59
+1014 Ripkin         , Jan        08-NOV-60
+1079 Wooton         , James      04-NOV-76
+1088 Hanzdo         , Lee        30-APR-31
+
+									PL/SQL: FOR Loop using counter
+
+declare
+    cursor a is select product_no, brand, class from product;
+    prod_var       a%rowtype;
+begin
+    open a;
+    for cnt_var   in 1..5
+    loop
+      fetch a into prod_var;
+      dbms_output.put_line(to_char(cnt_var)
+	||' '||prod_var.product_no 
+	||' '||prod_var.brand
+	||' '||prod_var.class);
+    end loop;
+    close a;
+end;
+/
+
+
+PL/SQL procedure successfully completed.
+
+1 120 Microsoft Xbox
+2 140 Samsung Memory Card
+3 130 Microsoft Controller
+4 110 Microsoft Xbox Set
+5 150 Sony Mario Game
+
+
+
+											Cursor FOR Loop
+									Cursor declared in declaration section
+
+declare
+    cursor a is select fname, lname from employee;
+begin
+    for cnt_var in a
+    loop
+      dbms_output.put_line(to_char(a%rowcount)||' '||cnt_var.lname);
+    end loop;
+end;
+/
+
+
+PL/SQL procedure successfully completed.
+
+1 Wyatt
+2 Wright
+3 Worral
+4 Wooton
+5 Widdes
+6 Wehland
+7 Thomas
+8 Thomas
+9 Stone
+10 Stewart
+
+
+											Cursor FOR Loop VS Numeric FOR Loop 
+
+
+
+
+declare
+    cursor a is select fname, lname from employee;
+begin
+    for cnt_var in a
+    loop
+      dbms_output.put_line(to_char(a%rowcount)||' '||cnt_var.lname);
+    end loop;
+end; 
+
+
+
+
+PL/SQL procedure successfully completed.
+
+1 Wyatt
+2 Wright
+3 Worral
+4 Wooton
+5 Widdes
+6 Wehland
+7 Thomas
+8 Thomas
+9 Stone
+10 Stewart
+
+
+
+
+
+**************************
+declare
+	cursor a is select lname, fname from employee;
+	cur_var            a%rowtype;
+begin
+	open a;
+	fetch a into cur_var;
+	while a%found 
+	loop
+		dbms_output.put_line (cur_var.lname|| ', '||cur_var.fname);
+		fetch a into cur_var;
+	end loop;
+      close a;
+end;
+/
+
+
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt, Stefan
+Wright, Donald
+Worral, Al
+Wooton, Bruce
+Widdes, Albert
+Wehland, William C.
+Thomas, Peter
+Thomas, Patricia A.
+Stone, James F.
+Stewart, John C.
+
+
+
+										Defining the Cursor in the Cursor FOR Header
+BEGIN
+     	dbms_output.put_line('Product_no  '||' '|| 'Unit_Price');
+	for cnt_var in (SELECT product_no, unit_price from product)
+   	LOOP          
+		dbms_output.put_line(cnt_var.product_no  
+	      	||' --------------- '||cnt_var.unit_price);
+   	END LOOP;
+END;
+/
+
+
+PL/SQL procedure successfully completed.
+
+Product_no   Unit_Price
+120 --------------- 200
+140 --------------- 50
+130 --------------- 55
+110 --------------- 400
+150 --------------- 50
+160 --------------- 4995
+170 --------------- 4495
+180 --------------- 125
+190 --------------- 75
+200 --------------- 50
+
+
+
+                                    Cursor in the Cursor FOR Header  vs  While  Loop 
+
+begin
+    for cnt_var in (select fname, lname from employee)
+    loop
+      dbms_output.put_line(cnt_var.lname||', '|| cnt_var.fname);
+    end loop;
+end;
+/
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt, Stefan
+Wright, Donald
+Worral, Al
+Wooton, Bruce
+Widdes, Albert
+Wehland, William C.
+Thomas, Peter
+Thomas, Patricia A.
+Stone, James F.
+Stewart, John C.
+Stansbury, Thomas
+Stansbury, Steward
+
+
+
+set serveroutput on
+declare
+    cursor a is select lname, fname from employee;
+    cur_var            a%rowtype;
+begin
+    open a;
+    fetch a into cur_var;
+    while a%found
+    loop
+      dbms_output.put_line (cur_var.lname|| ', '||cur_var.fname);
+      fetch a into cur_var;
+    end loop;
+end;
+/
+
+PL/SQL procedure successfully completed.
+
+Wyatt, Stefan
+Wright, Donald
+Worral, Al
+Wooton, Bruce
+Widdes, Albert
+Wehland, William C.
+Thomas, Peter
+Thomas, Patricia A.
+Stone, James F.
+
+
+										Comparison of FOR loop and WHILE loop
+
+begin
+    for cnt_var in (select fname, lname from employee)
+    loop
+      dbms_output.put_line(cnt_var.lname ||', '|| cnt_var.fname);
+    end loop;
+end;
+/
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt, Stefan
+Wright, Donald
+Worral, Al
+Wooton, Bruce
+Widdes, Albert
+Wehland, William C.
+Thomas, Peter
+Thomas, Patricia A.
+Stone, James F.
+
+declare
+    cursor a is select lname, fname from employee;
+    cur_var            a%rowtype;
+begin
+    open a;
+    fetch a into cur_var;
+    while a%found
+    loop
+        dbms_output.put_line (cur_var.lname|| ', '||cur_var.fname);
+        fetch a into cur_var;
+    end loop;
+    close a;
+end;
+
+
+PL/SQL procedure successfully completed.
+
+Wyatt, Stefan
+Wright, Donald
+Worral, Al
+Wooton, Bruce
+Widdes, Albert
+Wehland, William C.
+Thomas, Peter
+Thomas, Patricia A.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

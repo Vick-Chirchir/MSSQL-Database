@@ -1,0 +1,71 @@
+Objective: Developing TQP queries 
+Answer the following queries in SQL, RA, and QBE by using OES2 database. For SQL and RA, if the query requires join then develop solution for TIMES, Equi-Join, and Natural Join 
+
+Note: Symbols to be used in RA: σ ⋈ π
+
+Query 1: List unique pair of customer_no that both customers are from the same city.
+									
+--Relational Algebra (Time)
+
+C1  C
+π C.CUSTOMER_NO, C1.CUSTOMER_NO (σ C.CUSTOMER_NO > C1.CUSTOMER_NO    C.CITY = C1.CITY (C1) X (C))
+
+--Relational Algebra (Join)
+
+C1  C
+π C.CUSTOMER_NO, C1.CUSTOMER_NO (σ C.CUSTOMER_NO > C1.CUSTOMER_NO  (C1) ⋈  C1.CITY = CITY (C))
+
+--Structure Query Language (Time)
+
+SELECT C.CUSTOMER_NO, C1.CUSTOMER_NO FROM CUSTOMER C,CUSTOMER C1
+WHERE C.CITY = C1.CITY AND C.CUSTOMER_NO > C1.CUSTOMER_NO;
+
+--Structure Query Language (Join)
+
+SELECT C.CUSTOMER_NO, C1.CUSTOMER_NO FROM CUSTOMER C
+JOIN CUSTOMER C1 ON C.CITY = C1.CITY
+WHERE C.CUSTOMER_NO > C1.CUSTOMER_NO;
+
+--Structure Query Language (Natural Join)
+
+SELECT C.CUSTOMER_NO, C1.CUSTOMER_NO FROM CUSTOMER C
+NATURAL JOIN CUSTOMER C1 USING (CITY)
+WHERE C.CUSTOMER_NO > C1.CUSTOMER_NO;
+
+--QBE
+
+PROPERTY
+_FOR_RENT	Property_no	City	Condition
+	p._property_nox	_cityx	_property_nox >_property_noy
+			
+
+PROPERTY
+_FOR_RENT	Property_no1	City1
+	p._property_noy	_cityx
+		
+
+
+
+							RESULTS
+
+
+
+                            CUSTOMER_NO                             CUSTOMER_NO
+--------------------------------------- ---------------------------------------
+                                   1110                                    1000
+                                   1025                                    1000
+                                   1003                                    1000
+                                   1119                                    1023
+                                   1111                                    1023
+                                   1120                                    1060
+                                   1112                                    1060
+                                   1115                                    1064
+                                   1113                                    1064
+                                   1073                                    1064
+                                   1072                                    1064
+								   
+								   
+Query 2: List customer last name, and customer_no for customers who have purchased products with total order amount greater than $100,000.
+Query 3: List product description and price of the least expensive product.
+Query 4: List customer_no, customer last name for those customers from Mankato Minnesota.
+Query 5: List employee_no and last name of those emploees that their job title is customer service .

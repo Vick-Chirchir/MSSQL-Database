@@ -1,0 +1,599 @@
+Part 1:	Using OES4 database, redo the following two queries (you did them in assignment 4) with PL/SQL:
+1. List number of orders for each branch with their total purchase (SUBTOTAL), total shipping charge, total tax, and total purchases (there are 15 branches)
+BRANCH#, #_ORDERS, TOTAL PURCHAES, TOTAL SHIPPING CHARGES, TOTAL TAXES, TOTAL OVERALL PURCHASE (3)
+	Note: Use RPAD or LPAD to develop your report
+	
+	
+CREATE OR REPLACE PROCEDURE GET_NUM_ORDERS (BRAN_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_ORDERS OUT NUMBER) IS
+  CURSOR CURS IS SELECT COUNT(ORDER_NO)
+    FROM OES4.ORDERS
+    WHERE BRANCH_NO = BRAN_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_ORDERS;
+  CLOSE CURS;
+END GET_NUM_ORDERS;
+/
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_PURCHASES (BRAN_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_PURCHASES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(SUBTOTAL)
+    FROM OES4.ORDERS
+    WHERE BRANCH_NO = BRAN_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_PURCHASES;
+  CLOSE CURS;
+END GET_TOTAL_PURCHASES;
+/
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_SHIPPING_CHARGES (BRAN_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_SHIPPING_CHARGES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(SHIPPING_CHARGE)  
+    FROM OES4.ORDERS
+    WHERE BRANCH_NO = BRAN_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_SHIPPING_CHARGES;
+  CLOSE CURS;
+END GET_TOTAL_SHIPPING_CHARGES;
+/
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_TAXES (BRAN_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_TAXES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(TAX_AMT)  
+    FROM OES4.ORDERS
+    WHERE BRANCH_NO = BRAN_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_TAXES;
+  CLOSE CURS;
+END GET_TOTAL_TAXES;
+/
+
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_OVERALL_PURCHASES (BRAN_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_OVERALL_PURCHASES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(TOTAL_AMT)  
+    FROM OES4.ORDERS
+    WHERE BRANCH_NO = BRAN_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_OVERALL_PURCHASES;
+  CLOSE CURS;
+END GET_TOTAL_OVERALL_PURCHASES;
+/
+
+
+--DRIVER
+
+DECLARE
+ TOTAL_ORDERS NUMBER;
+ TOTAL_PURCHASES NUMBER;
+ TOTAL_SHIPPING_CHARGES NUMBER;
+ TOTAL_TAXES NUMBER;
+ TOTAL_OVERALL_PURCHASES NUMBER;
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('BRANCH#   #_ORDERS     TOTAL PURCHASES         TOTAL SHIPPING CHARGES    TOTAL TAXES        TOTAL OVERALL PURCHASE');
+  DBMS_OUTPUT.PUT_LINE('-------   --------     ---------------         ----------------------    -----------        ----------------------');
+  FOR A IN (SELECT DISTINCT ORDERS.BRANCH_NO FROM OES4.ORDERS)
+  LOOP
+    GET_NUM_ORDERS(A.BRANCH_NO,     TOTAL_ORDERS);
+    GET_TOTAL_PURCHASES(A.BRANCH_NO,     TOTAL_PURCHASES);
+    GET_TOTAL_SHIPPING_CHARGES(A.BRANCH_NO,     TOTAL_SHIPPING_CHARGES);
+    GET_TOTAL_TAXES(A.BRANCH_NO,     TOTAL_TAXES);
+    GET_TOTAL_OVERALL_PURCHASES(A.BRANCH_NO,     TOTAL_OVERALL_PURCHASES);
+    DBMS_OUTPUT.PUT_LINE(rpad(to_char(A.BRANCH_NO),12)
+    || rpad(to_char(TOTAL_ORDERS),20)||rpad(to_char(TOTAL_PURCHASES),20)
+    ||rpad(to_char(TOTAL_SHIPPING_CHARGES ),20)
+    ||rpad(to_char(TOTAL_TAXES),20)
+    || rpad(to_char(TOTAL_OVERALL_PURCHASES),20) );
+  END LOOP;
+END;
+
+------SOLUTION
+
+PL/SQL procedure successfully completed.
+
+BRANCH#   #_ORDERS     TOTAL PURCHASES         TOTAL SHIPPING CHARGES    TOTAL TAXES        TOTAL OVERALL PURCHASE
+-------   --------     ---------------         ----------------------    -----------        ----------------------
+100         215                 35007880            1201000.5           1128844.89983206    37337725.39983206   
+113         79                  28680995            724648.75           547658.3381066      29953302.0881066    
+108         92                  11520520            299293              291221.227418505    12111034.227418505  
+112         134                 25414340            806051.75           688842.377751395    26909234.127751395  
+102         74                  20175110            417434.75           625424.680004265    21217969.430004265  
+110         69                  16087795            354956.75           379584.223156325    16822335.973156325  
+114         48                  9036135             362634              248288.1489492      9647057.1489492     
+101         120                 11957615            399867.5            618095.66998343     12975578.16998343   
+107         99                  11467615            417870              230812.80252824     12116297.80252824   
+109         12                  1646200             39521.5             33720.062723865     1719441.562723865   
+104         114                 14439605            267779.25           758152.883388945    15465537.133388945  
+105         132                 33658205            672025.5            1723600.04568164    36053830.54568164   
+111         70                  13796770            293268              652672.766048725    14742710.766048725  
+103         82                  9939950             229557.25           346684.32112789     10516191.57112789   
+106         135                 18802065            690972.5            686450.493682575    20179487.993682575  
+
+
+2. List number of employees with their total sales (SUBTOTAL), total shipping charge, total tax, and overall total SALESs.
+EMPLOYEE_NO, TOTAL SALES, TOTAL SHIPPING CHARGES, TOTAL TAXES, TOTAL OVERALL SALES (3)
+
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_SALES (EMP_NO IN OES4.ORDERS.EMPLOYEE_NO%TYPE, TOTAL_SALES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(SUBTOTAL)
+    FROM OES4.ORDERS
+    WHERE EMPLOYEE_NO = EMP_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_SALES;
+  CLOSE CURS;
+END GET_TOTAL_SALES;
+/
+
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_SHIPPING_CHARGES (EMP_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_SHIPPING_CHARGES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(SHIPPING_CHARGE)  
+    FROM OES4.ORDERS
+    WHERE EMPLOYEE_NO = EMP_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_SHIPPING_CHARGES;
+  CLOSE CURS;
+END GET_TOTAL_SHIPPING_CHARGES;
+/
+
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_TAXES (EMP_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_TAXES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(TAX_AMT)  
+    FROM OES4.ORDERS
+    WHERE EMPLOYEE_NO = EMP_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_TAXES;
+  CLOSE CURS;
+END GET_TOTAL_TAXES;
+/
+
+
+CREATE OR REPLACE PROCEDURE GET_TOTAL_OVERALL_SALES (EMP_NO IN OES4.ORDERS.BRANCH_NO%TYPE, TOTAL_OVERALL_SALES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(TOTAL_AMT)  
+    FROM OES4.ORDERS
+    WHERE EMPLOYEE_NO = EMP_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_OVERALL_SALES;
+  CLOSE CURS;
+END GET_TOTAL_OVERALL_SALES;
+/
+
+
+---- DRIVER
+DECLARE
+ TOTAL_SALES NUMBER;
+ TOTAL_SHIPPING_CHARGES NUMBER;
+ TOTAL_TAXES NUMBER;
+ TOTAL_OVERALL_SALES NUMBER;
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('EMPLOYEE_NO   TOTAL SALES      TOTAL SHIPPING CHARGES    TOTAL TAXES        TOTAL OVERALL SALES');
+  DBMS_OUTPUT.PUT_LINE('-----------   -----------      ----------------------    -----------        -------------------');
+  FOR A IN (SELECT DISTINCT ORDERS.EMPLOYEE_NO FROM OES4.ORDERS)
+  LOOP
+    GET_TOTAL_SALES(A.EMPLOYEE_NO,     TOTAL_SALES);
+    GET_TOTAL_SHIPPING_CHARGES(A.EMPLOYEE_NO,     TOTAL_SHIPPING_CHARGES);
+    GET_TOTAL_TAXES(A.EMPLOYEE_NO,     TOTAL_TAXES);
+    GET_TOTAL_OVERALL_SALES(A.EMPLOYEE_NO,     TOTAL_OVERALL_SALES);
+    DBMS_OUTPUT.PUT_LINE(rpad(to_char(A.EMPLOYEE_NO),12)||rpad(to_char(TOTAL_SALES),20)
+    ||rpad(to_char(TOTAL_SHIPPING_CHARGES ),20)
+    ||rpad(to_char(TOTAL_TAXES),25)
+    || rpad(to_char(TOTAL_OVERALL_SALES),20) );
+  END LOOP;
+END;
+
+
+
+------SOLUTION
+
+PL/SQL procedure successfully completed.
+
+EMPLOYEE_NO   TOTAL SALES      TOTAL SHIPPING CHARGES    TOTAL TAXES        TOTAL OVERALL SALES
+-----------   -----------      ----------------------    -----------        -------------------
+1003        6295955             222931.75           331579.4598312           6850466.2098312     
+1013        1468275             71055               54502.24546452           1593832.24546452    
+1036        33658205            672025.5            1723600.04568164         36053830.54568164   
+1042        11520520            299293              291221.227418505         12111034.227418505  
+1047        7553635             223960.75           146228.001459505         7923823.751459505   
+1046        4406000             98681               64118.17473448           4568799.17473448    
+1065        4779950             103045.75           92261.04141973           4975256.79141973    
+1076        3693450             149226              9194.479128665           3851870.479128665   
+1016        1189085             3459.5              65839.00642941           1258383.50642941    
+1024        7901010             249071.75           372539.35                8522621.1           
+1030        505455              20938               2595.921875              528988.921875       
+1062        3153645             140525.75           166333.513212205         3460504.263212205   
+1054        8024410             165679              81560.53103774           8271649.53103774    
+1006        694675              28350.5             10673.98248899           733699.48248899     
+1088        4528620             214725              221476.183970625         4964821.183970625   
+1032        6222500             126039              349600.662101895         6698139.662101895   
+1060        3162200             94279.75            80353.85647575           3336833.60647575    
+1069        7923635             316936              310998.881555515         8551569.881555515   
+1070        15282965            313731.75           146618.792979625         15743315.542979625  
+1002        4160045             152304.75           69603.39430927           4381953.14430927    
+1029        4144340             113390.75           116427.07034698          4374157.82034698    
+1033        7345475             138759.75           361905.234863775         7846139.984863775   
+1034        871630              2980.5              46646.986423275          921257.486423275    
+1038        11489815            351164.25           330187.080872285         12171166.330872285  
+1061        7480925             58462.5             405985.39636077          7945372.89636077    
+1022        8070985             133615.5            180294.918744045         8384895.418744045   
+1028        5290155             95228.5             227661.32890591          5613044.82890591    
+1039        7312250             339808.25           356263.41281029          8008321.66281029    
+1071        5474395             93981               90040.66357146           5658416.66357146    
+1004        2765245             72210.25            108638.552617515         2946093.802617515   
+1015        2969530             55844.25            176703.206561765         3202077.456561765   
+1066        10280555            240360.75           193744.1785181           10714659.9285181    
+1077        2919685             124399              134177.647532785         3178261.647532785   
+1008        3526265             162696.75           95994.937684535          3784956.687684535   
+1005        2723640             64661.25            114252.275459805         2902553.525459805   
+1014        4383000             181657.5            194876.96304818          4759534.46304818    
+1084        5376340             227653              126783.813792505         5730776.813792505   
+1045        11467615            417870              230812.80252824          12116297.80252824   
+1078        2423000             89009               104916.02228775          2616925.02228775    
+1067        4977495             234992.25           276053.34402106          5488540.59402106    
+1053        5526420             85976.75            130559.55156679          5742956.30156679    
+1080        1947725             87851.25            126174.248479555         2161750.498479555   
+1023        4203115             34747.5             72590.41126022           4310452.91126022    
+1086        2536965             103301              167464.140551795         2807730.140551795   
+
+
+
+3. List all product categories and number of products sold for each category 
+			PRODUCT_CATEGORY	QTY_SOLD
+			
+CREATE OR REPLACE PROCEDURE Get_PRODUCT_NUM_CATEGORY(PROD_CAT IN OES4.PRODUCT.PRODUCT_CATEGORY%TYPE, NUM_CATEGORIES OUT NUMBER) IS
+  cursor CURS is SELECT SUM(ORDER_QTY) 
+    FROM OES4.PRODUCT 
+    WHERE PRODUCT_CATEGORY = PROD_CAT;  
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO NUM_CATEGORIES;
+  CLOSE CURS;
+END Get_PRODUCT_NUM_CATEGORY;
+/
+
+DECLARE
+  NUM_CATEGORIES NUMBER;
+BEGIN
+  for A in (select DISTINCT PRODUCT_CATEGORY from PRODUCT)
+  loop
+    Get_PRODUCT_NUM_CATEGORY(A.PRODUCT_CATEGORY,    NUM_CATEGORIES); 
+    DBMS_OUTPUT.PUT_LINE(rpad(to_char(A.PRODUCT_CATEGORY),12)|| rpad(to_char(NUM_CATEGORIES),20) );
+  end loop;
+END;
+
+
+--SOLUTION
+
+PL/SQL procedure successfully completed.
+
+Entertainmen10                  
+Hardware    60                  
+Game        115                 
+Software    50                  
+
+
+Part2: Using OES4, answer the following queries with stored procedures
+4	Create several procedures to accept product number and produce the following result
+a.	Procedure Get_Product_Num_Cust
+i.	Receives product number as input and produces number of customers purchased that product as output
+
+CREATE OR REPLACE PROCEDURE Get_Product_Num_Cust (PROD_NO IN ORDERLINE.PRODUCT_NO%TYPE, TOTAL_CUSTOMERS OUT NUMBER) IS
+  CURSOR CURS IS SELECT COUNT(CUSTOMER_NO) 
+    FROM ORDERS
+    JOIN ORDERLINE ON ORDERLINE.ORDER_NO = ORDERS.ORDER_NO
+    WHERE PRODUCT_NO = PROD_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_CUSTOMERS;
+  CLOSE CURS;
+END Get_Product_Num_Cust;
+/
+
+DECLARE
+  TOTAL_CUSTOMERS NUMBER;
+BEGIN
+  for A in (select PRODUCT_NO from PRODUCT)
+  loop
+    Get_Product_Num_Cust(A.PRODUCT_NO,    TOTAL_CUSTOMERS); -- call stored procedure
+    DBMS_OUTPUT.PUT_LINE(rpad(to_char(A.PRODUCT_NO),12)|| rpad(to_char(TOTAL_CUSTOMERS),20) );
+  end loop;
+END;
+
+--SOLUTION
+
+Procedure GET_PRODUCT_NUM_CUST compiled
+
+
+PL/SQL procedure successfully completed.
+
+110         316                 
+120         241                 
+130         345                 
+140         342                 
+150         306                 
+160         296                 
+170         273                 
+180         238                 
+190         234                 
+200         262                 
+
+
+b.	Procedure Get_ Product_Cust_Purchases
+i.	Receives Product number as input and produces total purchases by all customer of that product as output
+		
+CREATE OR REPLACE PROCEDURE Get_Product_Cust_Purchases (PROD_NO IN ORDERLINE.PRODUCT_NO%TYPE, TOTAL_PURCHASES OUT NUMBER) IS
+  CURSOR CURS IS SELECT SUM(SUBTOTAL) 
+    FROM ORDERS
+    JOIN ORDERLINE ON ORDERLINE.ORDER_NO = ORDERS.ORDER_NO
+    WHERE PRODUCT_NO = PROD_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_PURCHASES;
+  CLOSE CURS;
+END Get_Product_Cust_Purchases;
+/
+
+DECLARE
+  TOTAL_PURCHASES NUMBER;
+BEGIN
+  for A in (select PRODUCT_NO from PRODUCT)
+  loop
+    Get_Product_Cust_Purchases(A.PRODUCT_NO,    TOTAL_PURCHASES); -- call stored procedure
+    DBMS_OUTPUT.PUT_LINE(rpad(to_char(A.PRODUCT_NO),12)|| rpad(to_char(TOTAL_PURCHASES),20) );
+  end loop;
+END;
+
+
+--SOLUTION
+
+Procedure GET_PRODUCT_CUST_PURCHASES compiled
+
+
+PL/SQL procedure successfully completed.
+
+110         117319195           
+120         79866210            
+130         115028695           
+140         128734015           
+150         136905310           
+160         205721440           
+170         193288975           
+180         121415705           
+190         111470665           
+200         88878880            
+             
+
+
+c.	Procedure Get_product_Num_orders
+i.	Receives product number as input and produces number of orders by all customers for that product as output
+
+CREATE OR REPLACE PROCEDURE Get_product_Num_orders(PROD_NO IN PRODUCT.PRODUCT_NO%TYPE, TOTAL_ORDERS OUT NUMBER) IS
+  CURSOR CURS IS SELECT COUNT(ORDER_NO) 
+    FROM ORDERLINE
+    WHERE PRODUCT_NO = PROD_NO;
+BEGIN
+  OPEN CURS;
+  FETCH CURS INTO TOTAL_ORDERS;
+  CLOSE CURS;
+END Get_product_Num_orders;
+/
+
+DECLARE
+  TOTAL_ORDERS NUMBER;
+BEGIN
+  for A in (select PRODUCT_NO from PRODUCT)
+  loop
+    Get_product_Num_orders(A.PRODUCT_NO,    TOTAL_ORDERS); -- call stored procedure
+    DBMS_OUTPUT.PUT_LINE(rpad(to_char(A.PRODUCT_NO),12)|| rpad(to_char(TOTAL_ORDERS),20) );
+  end loop;
+END;
+
+--SOLUTION
+
+Procedure GET_PRODUCT_NUM_ORDERS compiled
+
+
+PL/SQL procedure successfully completed.
+
+110         316                 
+120         241                 
+130         345                 
+140         342                 
+150         306                 
+160         296                 
+170         273                 
+180         238                 
+190         234                 
+200         262                 
+
+
+5	Develop a driver program to call all the 5 above procedures and produce the following report 
+PRODUCT#, TOTAL_SALES, TOTAL_NUMBER_ORDERS
+
+DECLARE
+  TOTAL_PURCHASES NUMBER;
+  TOTAL_ORDERS NUMBER;
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('PRODUCT#   TOTAL_SALES   TOTAL_NUMBER_ORDERS');
+  DBMS_OUTPUT.PUT_LINE('--------   ------------  -------------------');
+  for A in (select PRODUCT_NO from PRODUCT)
+  loop
+    Get_Product_Cust_Purchases(A.PRODUCT_NO,    TOTAL_PURCHASES);
+    Get_product_Num_orders(A.PRODUCT_NO,    TOTAL_ORDERS);-- call stored procedure
+    DBMS_OUTPUT.PUT_LINE(rpad(to_char(A.PRODUCT_NO),12)
+    || rpad(to_char(TOTAL_PURCHASES),20)|| rpad(to_char(TOTAL_ORDERS),20) );
+  end loop;
+END;
+
+--SOLUTION
+
+PL/SQL procedure successfully completed.
+
+PRODUCT#   TOTAL_SALES   TOTAL_NUMBER_ORDERS
+--------   ------------  -------------------
+110         117319195           316                 
+120         79866210            241                 
+130         115028695           345                 
+140         128734015           342                 
+150         136905310           306                 
+160         205721440           296                 
+170         193288975           273                 
+180         121415705           238                 
+190         111470665           234                 
+200         88878880            262                 
+
+
+
+		Note: Net sales=Total_sales_amount  – total_return_amount
+Use RPAD or LPAD to develop your report
+
+Part3: Using OES4, answer the following queries with user defined functions
+6.	Create several user defined functions to accept product number and produce the following result
+a.	Function Get_Product_Num_Cust
+i.	Receives product number as input and produces number of customers purchased that product as output
+
+create or replace function Get_Product_Num_Cust (PROD_NO in number)
+  return number is
+  cursor a is SELECT COUNT(CUSTOMER_NO) AS CUST_NO  FROM ORDERS
+    JOIN ORDERLINE ON ORDERLINE.ORDER_NO = ORDERS.ORDER_NO
+    WHERE PRODUCT_NO = PROD_NO;
+    a_var a%rowtype;
+  begin
+    open a;
+        fetch a into a_var;
+        return a_var.CUST_NO;
+    end;
+/
+select PRODUCT_NO, Get_Product_Num_Cust(PRODUCT_NO) as Num_Customers from product;
+
+drop function Get_Product_Num_Cust;
+
+--SOLUTION
+
+Function GET_PRODUCT_NUM_CUST compiled
+
+
+PRODUCT_NO                           NUM_CUSTOMERS
+---------- ---------------------------------------
+       110                                     316
+       120                                     241
+       130                                     345
+       140                                     342
+       150                                     306
+       160                                     296
+       170                                     273
+       180                                     238
+       190                                     234
+       200                                     262
+
+ 10 rows selected 
+
+
+Function GET_PRODUCT_NUM_CUST dropped.
+
+
+
+
+b.	Function Get_ Product_Cust_Purchases
+i.	Receives Product number as input and produces total purchases by all customer of that product as output
+
+create or replace function Get_Product_Cust_Purchases (PROD_NO in number)
+  return number is
+  cursor a is SELECT SUM(SUBTOTAL) AS TOTAL_PURCHASES  FROM ORDERS
+    JOIN ORDERLINE ON ORDERLINE.ORDER_NO = ORDERS.ORDER_NO
+    WHERE PRODUCT_NO = PROD_NO;
+    a_var a%rowtype;
+  begin
+    open a;
+        fetch a into a_var;
+        return a_var.TOTAL_PURCHASES;
+    end;
+/
+select PRODUCT_NO, Get_Product_Cust_Purchases(PRODUCT_NO) as Cust_Purchases from product;
+
+drop function Get_Product_Cust_Purchases;
+
+--SOLUTION
+
+Function GET_PRODUCT_CUST_PURCHASES compiled
+
+
+PRODUCT_NO                          CUST_PURCHASES
+---------- ---------------------------------------
+       110                               117319195
+       120                                79866210
+       130                               115028695
+       140                               128734015
+       150                               136905310
+       160                               205721440
+       170                               193288975
+       180                               121415705
+       190                               111470665
+       200                                88878880
+
+ 10 rows selected 
+
+
+Function GET_PRODUCT_CUST_PURCHASES dropped.
+
+c.	Function Get_product_Num_orders
+i.	Receives product number as input and produces number of orders by all customers for that product as output
+
+create or replace function Get_product_Num_orders (productno in number)
+  return number is
+  cursor a is select count(order_no) as ORDS from orderline where product_no=productno;
+  a_var a%rowtype;
+  begin
+    open a;
+        fetch a into a_var;
+        return a_var.ORDS;
+    end;
+/
+select product_no, Get_product_Num_orders(product_no) as Total_Orders from product;
+
+drop function Get_product_Num_orders;
+
+--SOLUTION
+
+Function GET_PRODUCT_NUM_ORDERS compiled
+
+
+PRODUCT_NO                            TOTAL_ORDERS
+---------- ---------------------------------------
+       110                                     316
+       120                                     241
+       130                                     345
+       140                                     342
+       150                                     306
+       160                                     296
+       170                                     273
+       180                                     238
+       190                                     234
+       200                                     262
+
+ 10 rows selected 
+
+7	Develop SQL program to call these UDFs 
+PRODUCT#, TOTAL_SALES, TOTAL_NUMBER_ORDERS
+
+select product_no AS PRODUCT#, Get_Product_Cust_Purchases(PRODUCT_NO) as TOTAL_SALES,
+Get_product_Num_orders(product_no) as TOTAL_NUMBER_ORDERS from product;
+
+--SOLUTION
+
+PRODUCT#  TOTAL_SALES  TOTAL_NUMBER_ORDERS  
+110       117,319,195  316                  
+120       79,866,210   241                  
+130       115,028,695  345                  
+140       128,734,015  342                  
+150       136,905,310  306                  
+160       205,721,440  296                  
+170       193,288,975  273                  
+180       121,415,705  238                  
+190       111,470,665  234                  
+200       88,878,880   262                  
+
+
+ 10 rows selected 
